@@ -3,7 +3,7 @@
 @section('title', 'Add Product')
 
 @section('content')
-<div class="card card-stat p-4" style="max-width:760px">
+<div class="card card-stat p-4" style="max-width:920px">
     <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
         @csrf
         @include('admin.products._form')

@@ -13,11 +13,16 @@ class HomeController extends Controller
 {
     public function index(Request $request, CartService $cart): View
     {
-        $categories = Category::query()->where('is_active', true)->orderBy('name')->get();
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->where('slug', '!=', Product::COMBO_CATEGORY_SLUG)
+            ->orderBy('name')
+            ->get();
 
         $products = Product::query()
             ->with('category')
             ->where('is_active', true)
+            ->whereDoesntHave('category', fn ($q) => $q->where('slug', Product::COMBO_CATEGORY_SLUG))
             ->when($request->filled('category'), function ($query) use ($request) {
                 $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
             })
@@ -31,9 +36,17 @@ class HomeController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $combos = Product::query()
+            ->with(['category', 'components'])
+            ->where('is_active', true)
+            ->whereHas('category', fn ($q) => $q->where('slug', Product::COMBO_CATEGORY_SLUG))
+            ->latest()
+            ->get();
+
         return view('store.home', [
             'products' => $products,
             'categories' => $categories,
+            'combos' => $combos,
             'cartCount' => $cart->count(),
             'activeCategory' => $request->string('category')->toString(),
             'search' => $request->string('q')->toString(),

@@ -115,4 +115,16 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Order Notifications
+    |--------------------------------------------------------------------------
+    |
+    | New store orders are emailed to this address after successful placement
+    | (COD) or payment verification (Razorpay).
+    |
+    */
+
+    'admin_address' => env('ADMIN_EMAIL', 'venkat5721@gmail.com'),
+
 ];

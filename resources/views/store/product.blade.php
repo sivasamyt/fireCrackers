@@ -20,6 +20,21 @@
                     @endif
                 </div>
                 <p class="text-secondary">{{ $product->description }}</p>
+                @if($product->isCombo() && $product->components->isNotEmpty())
+                    <div class="mb-3">
+                        <div class="fw-semibold mb-2">This combo includes</div>
+                        <ul class="mb-0">
+                            @foreach($product->components as $component)
+                                <li>
+                                    <a href="{{ route('products.show', $component->slug) }}">{{ $component->name }}</a>
+                                    @if($component->pivot->quantity > 1)
+                                        × {{ $component->pivot->quantity }}
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <p class="small">Stock: {{ $product->stock }}</p>
                 <form method="POST" action="{{ route('cart.store') }}" class="d-flex gap-2">
                     @csrf

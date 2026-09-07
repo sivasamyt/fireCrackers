@@ -12,7 +12,7 @@
         <p class="fs-5 mt-3">Premium sparklers, rockets, and festive packs delivered to your door. Bright nights. Bold celebrations.</p>
         <div class="cta-group d-flex gap-3 mt-4">
             <a href="#catalog" class="btn btn-gold btn-lg px-4">Shop Now</a>
-            <a href="{{ route('cart.index') }}" class="btn btn-outline-gold btn-lg px-4">View Cart</a>
+            <a href="#combos" class="btn btn-outline-gold btn-lg px-4">Combo Packs</a>
         </div>
     </div>
 </section>
@@ -67,4 +67,51 @@
 
     <div class="mt-4">{{ $products->links() }}</div>
 </section>
+
+@if($combos->isNotEmpty())
+<section id="combos" class="container pb-5">
+    <div class="mb-4">
+        <h2 class="brand-font display-5 mb-1 text-warning">Combo Packs</h2>
+        <p class="text-secondary mb-0">Special bundles mapped from multiple crackers — priced as one pack.</p>
+    </div>
+    <div class="row g-4">
+        @foreach($combos as $combo)
+            <div class="col-sm-6 col-lg-4">
+                <div class="product-card">
+                    <a href="{{ route('products.show', $combo->slug) }}">
+                        <img src="{{ $combo->image_url }}" alt="{{ $combo->name }}">
+                    </a>
+                    <div class="p-3">
+                        <div class="small text-secondary">Combo</div>
+                        <h3 class="h5 mt-1"><a href="{{ route('products.show', $combo->slug) }}" class="text-decoration-none" style="color:inherit">{{ $combo->name }}</a></h3>
+                        <p class="small text-secondary mb-1">Includes:</p>
+                        <ul class="small text-secondary mb-2 ps-3">
+                            @foreach($combo->components as $component)
+                                <li>
+                                    {{ $component->name }}
+                                    @if($component->pivot->quantity > 1)
+                                        × {{ $component->pivot->quantity }}
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="price-now">₹{{ number_format($combo->discounted_price, 2) }}</span>
+                            @if($combo->discount_percent > 0)
+                                <span class="price-old">₹{{ number_format($combo->price, 2) }}</span>
+                                <span class="badge badge-disc">{{ $combo->discount_percent }}% off</span>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('cart.store') }}">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $combo->id }}">
+                            <button class="btn btn-gold w-100" @disabled($combo->stock < 1)>{{ $combo->stock < 1 ? 'Out of stock' : 'Add to Cart' }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
+@endif
 @endsection

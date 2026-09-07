@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Product extends Model
 {
+    public const COMBO_CATEGORY_SLUG = 'combo';
+
     protected $fillable = [
         'category_id',
         'name',
@@ -42,6 +45,21 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function components(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'combo_product_items',
+            'combo_product_id',
+            'product_id'
+        )->withPivot('quantity')->withTimestamps();
+    }
+
+    public function isCombo(): bool
+    {
+        return $this->category?->slug === self::COMBO_CATEGORY_SLUG;
     }
 
     public function getDiscountedPriceAttribute(): float

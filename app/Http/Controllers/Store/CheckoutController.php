@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminNewOrderMail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
@@ -10,6 +11,7 @@ use App\Services\RazorpayService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -108,6 +110,7 @@ class CheckoutController extends Controller
         if ($data['payment_method'] === 'cod') {
             $cart->clear();
             session()->put('guest_order_ids', array_unique(array_merge(session('guest_order_ids', []), [$order->id])));
+            $this->notifyAdmin($order);
 
             return redirect()->route('orders.show', $order)->with('success', 'Order placed with Cash on Delivery.');
         }
@@ -156,6 +159,7 @@ class CheckoutController extends Controller
 
         $cart->clear();
         session()->put('guest_order_ids', array_unique(array_merge(session('guest_order_ids', []), [$order->id])));
+        $this->notifyAdmin($order);
 
         return redirect()->route('orders.show', $order)->with('success', 'Payment successful. Order confirmed.');
     }
@@ -184,5 +188,16 @@ class CheckoutController extends Controller
         }
 
         abort(403);
+    }
+
+    private function notifyAdmin(Order $order): void
+    {
+        try {
+            $order->loadMissing('items');
+
+            Mail::to(config('mail.admin_address'))->send(new AdminNewOrderMail($order));
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 }

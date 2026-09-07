@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function show(string $slug, CartService $cart): View
     {
         $product = Product::query()
-            ->with('category')
+            ->with(['category', 'components'])
             ->where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();

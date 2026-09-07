@@ -15,7 +15,12 @@
             @foreach($products as $product)
                 <tr>
                     <td><img src="{{ $product->image_url }}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:.4rem;"></td>
-                    <td>{{ $product->name }}</td>
+                    <td>
+                        {{ $product->name }}
+                        @if($product->category?->slug === \App\Models\Product::COMBO_CATEGORY_SLUG)
+                            <span class="badge text-bg-warning">Combo</span>
+                        @endif
+                    </td>
                     <td>{{ $product->category?->name }}</td>
                     <td>₹{{ number_format($product->price, 2) }}</td>
                     <td>{{ $product->discount_percent }}%</td>
