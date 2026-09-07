@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ProductSampleExport;
 use App\Http\Controllers\Controller;
+use App\Imports\ProductsImport;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +14,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductController extends Controller
 {
@@ -20,6 +24,38 @@ class ProductController extends Controller
         $products = Product::query()->with('category')->latest()->paginate(12);
 
         return view('admin.products.index', compact('products'));
+    }
+
+    public function downloadSample(): BinaryFileResponse
+    {
+        return Excel::download(new ProductSampleExport, 'products-sample.xlsx');
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ]);
+
+        $import = new ProductsImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Could not import products. Check the file format and try again.');
+        }
+
+        $message = "{$import->created} product".($import->created === 1 ? '' : 's').' imported.';
+
+        if ($import->errors !== []) {
+            $preview = implode(' ', array_slice($import->errors, 0, 5));
+
+            return back()->with('error', $message.' Some rows failed: '.$preview);
+        }
+
+        return back()->with('success', $message);
     }
 
     public function create(): View

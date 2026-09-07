@@ -36,8 +36,15 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('categories/sample', [AdminCategoryController::class, 'downloadSample'])->name('categories.sample');
+    Route::post('categories/import', [AdminCategoryController::class, 'import'])->name('categories.import');
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
+
+    Route::get('products/sample', [AdminProductController::class, 'downloadSample'])->name('products.sample');
+    Route::post('products/import', [AdminProductController::class, 'import'])->name('products.import');
     Route::resource('products', AdminProductController::class)->except(['show']);
+
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');

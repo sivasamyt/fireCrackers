@@ -7,6 +7,34 @@
     <p class="mb-0 text-muted">Upload and manage firecracker products</p>
     <a href="{{ route('admin.products.create') }}" class="btn btn-dark">Add Product</a>
 </div>
+
+<div class="card card-stat p-3 mb-3">
+    <div class="d-flex flex-wrap align-items-end gap-3 justify-content-between">
+        <div>
+            <h2 class="h6 mb-1">Import from Excel</h2>
+            <p class="text-muted small mb-0">
+                Columns: <code>category_name</code>, <code>name</code>, <code>description</code>,
+                <code>price</code>, <code>discount_percent</code>, <code>stock</code>, <code>is_active</code>
+            </p>
+            <p class="text-muted small mb-0">Category name must already exist. Images and combo items are set after import.</p>
+        </div>
+        <a href="{{ route('admin.products.sample') }}" class="btn btn-outline-dark">Download sample</a>
+    </div>
+    <form method="POST" action="{{ route('admin.products.import') }}" enctype="multipart/form-data" class="row g-2 align-items-end mt-2">
+        @csrf
+        <div class="col-md-8">
+            <label class="form-label" for="product-import-file">Excel file</label>
+            <input id="product-import-file" type="file" name="file" class="form-control @error('file') is-invalid @enderror" accept=".xlsx,.xls,.csv" required>
+            @error('file')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-dark w-100">Upload</button>
+        </div>
+    </form>
+</div>
+
 <div class="card card-stat p-3">
     <div class="table-responsive">
         <table class="table align-middle mb-0">

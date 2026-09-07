@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\CategorySampleExport;
 use App\Http\Controllers\Controller;
+use App\Imports\CategoriesImport;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CategoryController extends Controller
 {
@@ -16,6 +20,38 @@ class CategoryController extends Controller
         $categories = Category::query()->withCount('products')->latest()->paginate(15);
 
         return view('admin.categories.index', compact('categories'));
+    }
+
+    public function downloadSample(): BinaryFileResponse
+    {
+        return Excel::download(new CategorySampleExport, 'categories-sample.xlsx');
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ]);
+
+        $import = new CategoriesImport;
+
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Could not import categories. Check the file format and try again.');
+        }
+
+        $message = "{$import->created} categor".($import->created === 1 ? 'y' : 'ies').' imported.';
+
+        if ($import->errors !== []) {
+            $preview = implode(' ', array_slice($import->errors, 0, 5));
+
+            return back()->with('error', $message.' Some rows failed: '.$preview);
+        }
+
+        return back()->with('success', $message);
     }
 
     public function create(): View
