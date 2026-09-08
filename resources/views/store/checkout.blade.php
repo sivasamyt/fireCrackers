@@ -17,8 +17,8 @@
                             <input type="text" name="guest_name" value="{{ old('guest_name') }}" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="guest_email" placeholder="Optional" value="{{ old('guest_email') }}" class="form-control" required>
+                            <label class="form-label">Email <span class="text-secondary small">(optional)</span></label>
+                            <input type="email" name="guest_email" value="{{ old('guest_email') }}" class="form-control">
                         </div>
                     </div>
                     <p class="small text-secondary">Optional: <a href="{{ route('register') }}">create an account</a> to track orders later.</p>

@@ -48,7 +48,7 @@ class CheckoutController extends Controller
 
         $rules = [
             'guest_name' => [Rule::requiredIf(! auth()->check()), 'nullable', 'string', 'max:255'],
-            'guest_email' => [Rule::requiredIf(! auth()->check()), 'nullable', 'email', 'max:255'],
+            'guest_email' => ['nullable', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:20'],
             'address_line1' => ['required', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
@@ -70,7 +70,7 @@ class CheckoutController extends Controller
                     'order_number' => 'FC-'.strtoupper(Str::random(8)),
                     'user_id' => auth()->id(),
                     'guest_name' => auth()->check() ? auth()->user()->name : $data['guest_name'],
-                    'guest_email' => auth()->check() ? auth()->user()->email : $data['guest_email'],
+                    'guest_email' => auth()->check() ? auth()->user()->email : ($data['guest_email'] ?? null),
                     'guest_phone' => $data['guest_phone'],
                     'status' => 'pending',
                     'payment_method' => $data['payment_method'],

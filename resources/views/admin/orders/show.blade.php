@@ -27,7 +27,7 @@
         <div class="card card-stat p-3 mb-3">
             <h2 class="h5">Customer</h2>
             <p class="mb-1">{{ $order->customerName() }}</p>
-            <p class="mb-1">{{ $order->customerEmail() }}</p>
+            <p class="mb-1">{{ $order->customerEmail() ?? '—' }}</p>
             <p class="mb-1">{{ $order->customerPhone() }}</p>
             <p class="mb-0">{{ $order->fullAddress() }}</p>
         </div>

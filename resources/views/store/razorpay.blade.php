@@ -37,7 +37,7 @@
         },
         prefill: {
             name: @json($order->guest_name),
-            email: @json($order->guest_email),
+            email: @json($order->customerEmail() ?? ''),
             contact: @json($order->guest_phone),
         },
         theme: { color: '#f5c451' }
