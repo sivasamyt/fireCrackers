@@ -12,6 +12,7 @@
         <p class="fs-5 mt-3">Premium sparklers, rockets, and festive packs delivered to your door. Bright nights. Bold celebrations.</p>
         <div class="cta-group d-flex gap-3 mt-4 flex-wrap">
             <a href="#catalog" class="btn btn-gold btn-lg px-4">Shop Now</a>
+            <a href="{{ route('products.index') }}" class="btn btn-outline-gold btn-lg px-4">All Products</a>
             <a href="#combos" class="btn btn-outline-gold btn-lg px-4">Combo Packs</a>
             <a href="#gift-boxes" class="btn btn-outline-gold btn-lg px-4">Gift Boxes</a>
         </div>

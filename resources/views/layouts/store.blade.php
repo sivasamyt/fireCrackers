@@ -127,6 +127,57 @@
         a { color: var(--fc-gold); text-decoration: none; }
         a:hover { color: var(--fc-amber); }
         .alert { border: 0; }
+        .pagination {
+            --bs-pagination-padding-x: .85rem;
+            --bs-pagination-padding-y: .45rem;
+            --bs-pagination-font-size: .95rem;
+            --bs-pagination-color: var(--fc-cream);
+            --bs-pagination-bg: rgba(16,24,43,.9);
+            --bs-pagination-border-width: 1px;
+            --bs-pagination-border-color: rgba(245,196,81,.25);
+            --bs-pagination-hover-color: var(--fc-gold);
+            --bs-pagination-hover-bg: rgba(245,196,81,.12);
+            --bs-pagination-hover-border-color: rgba(245,196,81,.5);
+            --bs-pagination-focus-color: var(--fc-gold);
+            --bs-pagination-focus-bg: rgba(245,196,81,.12);
+            --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(245,196,81,.2);
+            --bs-pagination-active-color: #1a1205;
+            --bs-pagination-active-bg: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
+            --bs-pagination-active-border-color: var(--fc-gold);
+            --bs-pagination-disabled-color: var(--fc-muted);
+            --bs-pagination-disabled-bg: rgba(11,18,32,.7);
+            --bs-pagination-disabled-border-color: rgba(245,196,81,.12);
+            gap: .35rem;
+        }
+        .pagination .page-link {
+            border-radius: .5rem;
+            background: rgba(16,24,43,.9);
+            color: var(--fc-cream);
+            border-color: rgba(245,196,81,.25);
+        }
+        .pagination .page-link:hover {
+            background: rgba(245,196,81,.12);
+            color: var(--fc-gold);
+            border-color: rgba(245,196,81,.5);
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
+            border-color: var(--fc-gold);
+            color: #1a1205;
+            font-weight: 700;
+        }
+        .pagination .page-item.disabled .page-link {
+            background: rgba(11,18,32,.7);
+            color: var(--fc-muted);
+            border-color: rgba(245,196,81,.12);
+            opacity: .7;
+        }
+        nav[role="navigation"] .small,
+        nav[aria-label] .small,
+        nav[role="navigation"] .text-muted,
+        nav[aria-label] .text-muted {
+            color: var(--fc-muted) !important;
+        }
     </style>
     @stack('head')
 </head>

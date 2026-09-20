@@ -5,10 +5,40 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\CartService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
+    public function index(Request $request, CartService $cart): View
+    {
+        $search = $request->string('q')->toString();
+
+        $products = Product::query()
+            ->with('category')
+            ->where('is_active', true)
+            ->whereDoesntHave('category', fn ($q) => $q->where('slug', Product::COMBO_CATEGORY_SLUG))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('name', 'like', '%'.$search.'%');
+            })
+            ->latest()
+            ->paginate(12)
+            ->appends($request->only('q'));
+
+        if ($request->boolean('partial')) {
+            return view('store.partials.catalog-results', [
+                'products' => $products,
+                'search' => $search,
+            ]);
+        }
+
+        return view('store.products.index', [
+            'products' => $products,
+            'search' => $search,
+            'cartCount' => $cart->count(),
+        ]);
+    }
+
     public function show(string $slug, CartService $cart): View
     {
         $product = Product::query()

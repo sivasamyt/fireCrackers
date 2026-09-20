@@ -14,6 +14,7 @@ use App\Http\Controllers\Store\ProductController as StoreProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [StoreProductController::class, 'show'])->name('products.show');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
