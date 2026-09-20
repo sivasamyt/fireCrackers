@@ -3,6 +3,7 @@
 use App\Http\Controllers\Account\OrderController as AccountOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\GiftBoxController as AdminGiftBoxController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\ProfileController;
@@ -44,6 +45,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('products/sample', [AdminProductController::class, 'downloadSample'])->name('products.sample');
     Route::post('products/import', [AdminProductController::class, 'import'])->name('products.import');
     Route::resource('products', AdminProductController::class)->except(['show']);
+
+    Route::resource('gift-boxes', AdminGiftBoxController::class)->except(['show']);
 
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');

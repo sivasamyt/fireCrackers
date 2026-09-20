@@ -83,7 +83,7 @@
                 <h2 class="h5 mb-3">Order Summary</h2>
                 @foreach($items as $item)
                     <div class="d-flex justify-content-between mb-2">
-                        <span>{{ $item['product']->name }} × {{ $item['quantity'] }}</span>
+                        <span>{{ $item['name'] }} × {{ $item['quantity'] }}</span>
                         <span>₹{{ number_format($item['line_total'], 2) }}</span>
                     </div>
                 @endforeach

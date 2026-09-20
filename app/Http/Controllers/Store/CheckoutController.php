@@ -88,15 +88,24 @@ class CheckoutController extends Controller
                 foreach ($totals['items'] as $item) {
                     OrderItem::query()->create([
                         'order_id' => $order->id,
-                        'product_id' => $item['product']->id,
-                        'product_name' => $item['product']->name,
+                        'product_id' => $item['product']?->id,
+                        'product_name' => $item['name'],
                         'unit_price' => $item['original_price'],
                         'discount_percent' => $item['discount_percent'],
                         'quantity' => $item['quantity'],
                         'line_total' => $item['line_total'],
                     ]);
 
-                    $item['product']->decrement('stock', min($item['quantity'], max(0, $item['product']->stock)));
+                    if ($item['product']) {
+                        $item['product']->decrement('stock', min($item['quantity'], max(0, $item['product']->stock)));
+
+                        continue;
+                    }
+
+                    foreach ($item['gift_box']->products as $boxProduct) {
+                        $needed = $item['quantity'] * (int) $boxProduct->pivot->quantity;
+                        $boxProduct->decrement('stock', min($needed, max(0, $boxProduct->stock)));
+                    }
                 }
 
                 return $order;

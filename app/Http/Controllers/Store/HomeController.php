@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\GiftBox;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\Request;
@@ -57,10 +58,17 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+        $giftBoxes = GiftBox::query()
+            ->with('products')
+            ->where('is_active', true)
+            ->latest()
+            ->get();
+
         return view('store.home', [
             'products' => $products,
             'categories' => $categories,
             'combos' => $combos,
+            'giftBoxes' => $giftBoxes,
             'cartCount' => $cart->count(),
             'activeCategory' => $activeCategory,
             'search' => $search,

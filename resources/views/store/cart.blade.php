@@ -13,16 +13,22 @@
             <div class="col-lg-8">
                 <div class="panel">
                     @foreach($items as $item)
+                        @php($lineField = $item['type'] === 'gift_box' ? 'gift_box_id' : 'product_id')
                         <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center border-bottom border-secondary border-opacity-25 py-3">
-                            <img src="{{ $item['product']->image_url }}" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:.5rem;">
+                            <img src="{{ $item['image_url'] }}" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:.5rem;">
                             <div class="flex-grow-1">
-                                <div class="fw-semibold">{{ $item['product']->name }}</div>
+                                <div class="fw-semibold">
+                                    {{ $item['name'] }}
+                                    @if($item['type'] === 'gift_box')
+                                        <span class="badge text-bg-warning">Gift Box</span>
+                                    @endif
+                                </div>
                                 <div class="small text-secondary">₹{{ number_format($item['unit_price'], 2) }} each</div>
                             </div>
                             <form method="POST" action="{{ route('cart.update') }}" class="d-flex gap-2">
                                 @csrf
                                 @method('PATCH')
-                                <input type="hidden" name="product_id" value="{{ $item['product']->id }}">
+                                <input type="hidden" name="{{ $lineField }}" value="{{ $item['id'] }}">
                                 <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="0" max="50" class="form-control" style="width:80px">
                                 <button class="btn btn-outline-gold btn-sm">Update</button>
                             </form>
@@ -30,7 +36,7 @@
                             <form method="POST" action="{{ route('cart.destroy') }}">
                                 @csrf
                                 @method('DELETE')
-                                <input type="hidden" name="product_id" value="{{ $item['product']->id }}">
+                                <input type="hidden" name="{{ $lineField }}" value="{{ $item['id'] }}">
                                 <button class="btn btn-sm btn-outline-danger">Remove</button>
                             </form>
                         </div>
