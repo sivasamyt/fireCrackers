@@ -29,6 +29,7 @@ class ProductController extends Controller
             return view('store.partials.catalog-results', [
                 'products' => $products,
                 'search' => $search,
+                'cartQuantities' => $cart->productQuantities(),
             ]);
         }
 
@@ -36,6 +37,8 @@ class ProductController extends Controller
             'products' => $products,
             'search' => $search,
             'cartCount' => $cart->count(),
+            'cartQuantities' => $cart->productQuantities(),
+            'cartSummary' => $cart->summary(),
         ]);
     }
 
@@ -54,10 +57,15 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
+        $cartQuantities = $cart->productQuantities();
+
         return view('store.product', [
             'product' => $product,
             'related' => $related,
             'cartCount' => $cart->count(),
+            'cartQuantities' => $cartQuantities,
+            'cartQuantity' => $cartQuantities[$product->id] ?? 0,
+            'cartSummary' => $cart->summary(),
         ]);
     }
 }

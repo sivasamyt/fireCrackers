@@ -54,6 +54,10 @@
     </div>
     <div class="row g-4">
         @foreach($combos as $combo)
+            @php
+                $comboQty = (int) (($cartQuantities ?? [])[$combo->id] ?? 0);
+                $comboDisplayQty = $comboQty > 0 ? $comboQty : 1;
+            @endphp
             <div class="col-sm-6 col-lg-4">
                 <div class="product-card">
                     <a href="{{ route('products.show', $combo->slug) }}">
@@ -73,18 +77,22 @@
                                 </li>
                             @endforeach
                         </ul>
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="price-now">₹{{ number_format($combo->discounted_price, 2) }}</span>
+                        <div class="d-flex align-items-center gap-2 mb-3" data-price-row>
+                            <span
+                                class="price-now"
+                                data-unit-price="{{ $combo->discounted_price }}"
+                                data-original-price="{{ $combo->price }}"
+                            >₹{{ number_format($combo->discounted_price * $comboDisplayQty, 2) }}</span>
                             @if($combo->discount_percent > 0)
-                                <span class="price-old">₹{{ number_format($combo->price, 2) }}</span>
+                                <span class="price-old" data-original-price="{{ $combo->price }}">₹{{ number_format($combo->price * $comboDisplayQty, 2) }}</span>
                                 <span class="badge badge-disc">{{ $combo->discount_percent }}% off</span>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('cart.store') }}">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $combo->id }}">
-                            <button class="btn btn-gold w-100" @disabled($combo->stock < 1)>{{ $combo->stock < 1 ? 'Out of stock' : 'Add to Cart' }}</button>
-                        </form>
+                        @include('store.partials.cart-control', [
+                            'productId' => $combo->id,
+                            'stock' => $combo->stock,
+                            'quantity' => $comboQty,
+                        ])
                     </div>
                 </div>
             </div>
@@ -101,6 +109,10 @@
     </div>
     <div class="row g-4">
         @foreach($giftBoxes as $box)
+            @php
+                $boxQty = (int) (($giftBoxQuantities ?? [])[$box->id] ?? 0);
+                $boxDisplayQty = $boxQty > 0 ? $boxQty : 1;
+            @endphp
             <div class="col-sm-6 col-lg-4">
                 <div class="product-card h-100">
                     <button type="button" class="btn p-0 border-0 w-100" data-bs-toggle="modal" data-bs-target="#gift-box-{{ $box->id }}">
@@ -144,13 +156,18 @@
                                 @endforeach
                             </ul>
                         </div>
-                        <div class="modal-footer justify-content-between">
-                            <span class="fw-bold">₹{{ number_format($box->discounted_price, 2) }}</span>
-                            <form method="POST" action="{{ route('cart.store') }}">
-                                @csrf
-                                <input type="hidden" name="gift_box_id" value="{{ $box->id }}">
-                                <button class="btn btn-gold">Add gift box to cart</button>
-                            </form>
+                        <div class="modal-footer justify-content-between align-items-center" data-price-row>
+                            <span
+                                class="fw-bold price-now"
+                                data-unit-price="{{ $box->discounted_price }}"
+                                data-original-price="{{ $box->price }}"
+                            >₹{{ number_format($box->discounted_price * $boxDisplayQty, 2) }}</span>
+                            @include('store.partials.cart-control', [
+                                'giftBoxId' => $box->id,
+                                'stock' => 50,
+                                'quantity' => $boxQty,
+                                'addLabel' => 'Add gift box to cart',
+                            ])
                         </div>
                     </div>
                 </div>

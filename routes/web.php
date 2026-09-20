@@ -18,6 +18,7 @@ Route::get('/products', [StoreProductController::class, 'index'])->name('product
 Route::get('/products/{slug}', [StoreProductController::class, 'show'])->name('products.show');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::get('/cart/summary', [CartController::class, 'summary'])->name('cart.summary');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart', [CartController::class, 'destroy'])->name('cart.destroy');

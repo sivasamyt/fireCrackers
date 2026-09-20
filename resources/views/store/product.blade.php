@@ -12,10 +12,15 @@
             <div class="panel h-100">
                 <div class="text-secondary">{{ $product->category?->name }}</div>
                 <h1 class="brand-font display-4 text-warning">{{ $product->name }}</h1>
-                <div class="d-flex align-items-center gap-2 my-3">
-                    <span class="price-now fs-3">₹{{ number_format($product->discounted_price, 2) }}</span>
+                @php($displayQty = ((int) ($cartQuantity ?? 0)) > 0 ? (int) $cartQuantity : 1)
+                <div class="d-flex align-items-center gap-2 my-3" data-price-row>
+                    <span
+                        class="price-now fs-3"
+                        data-unit-price="{{ $product->discounted_price }}"
+                        data-original-price="{{ $product->price }}"
+                    >₹{{ number_format($product->discounted_price * $displayQty, 2) }}</span>
                     @if($product->discount_percent > 0)
-                        <span class="price-old">₹{{ number_format($product->price, 2) }}</span>
+                        <span class="price-old" data-original-price="{{ $product->price }}">₹{{ number_format($product->price * $displayQty, 2) }}</span>
                         <span class="badge badge-disc">{{ $product->discount_percent }}% off</span>
                     @endif
                 </div>
@@ -36,12 +41,13 @@
                     </div>
                 @endif
                 <p class="small">Stock: {{ $product->stock }}</p>
-                <form method="POST" action="{{ route('cart.store') }}" class="d-flex gap-2">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="number" name="quantity" value="1" min="1" max="50" class="form-control" style="max-width:100px">
-                    <button class="btn btn-gold" @disabled($product->stock < 1)>Add to Cart</button>
-                </form>
+                <div style="max-width:280px">
+                    @include('store.partials.cart-control', [
+                        'productId' => $product->id,
+                        'stock' => $product->stock,
+                        'quantity' => (int) ($cartQuantity ?? 0),
+                    ])
+                </div>
             </div>
         </div>
     </div>

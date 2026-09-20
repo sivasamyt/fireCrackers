@@ -29,6 +29,60 @@ class CartService
             + collect($this->giftBoxItems())->sum('quantity');
     }
 
+    /**
+     * @return array<int, int> product_id => quantity
+     */
+    public function productQuantities(): array
+    {
+        $quantities = [];
+
+        foreach ($this->items() as $row) {
+            $quantities[(int) $row['product_id']] = (int) $row['quantity'];
+        }
+
+        return $quantities;
+    }
+
+    /**
+     * @return array<int, int> gift_box_id => quantity
+     */
+    public function giftBoxQuantities(): array
+    {
+        $quantities = [];
+
+        foreach ($this->giftBoxItems() as $row) {
+            $quantities[(int) $row['gift_box_id']] = (int) $row['quantity'];
+        }
+
+        return $quantities;
+    }
+
+    /**
+     * Compact cart payload for AJAX / header dropdown.
+     *
+     * @return array{cart_count: int, grand_total: float, items: list<array{type: string, id: int, name: string, image_url: string, quantity: int, unit_price: float, line_total: float}>}
+     */
+    public function summary(): array
+    {
+        $totals = $this->totals();
+
+        $items = $totals['items']->map(fn (array $item) => [
+            'type' => $item['type'],
+            'id' => $item['id'],
+            'name' => $item['name'],
+            'image_url' => $item['image_url'],
+            'quantity' => $item['quantity'],
+            'unit_price' => $item['unit_price'],
+            'line_total' => $item['line_total'],
+        ])->values()->all();
+
+        return [
+            'cart_count' => $this->count(),
+            'grand_total' => $totals['grand_total'],
+            'items' => $items,
+        ];
+    }
+
     public function add(Product $product, int $quantity = 1): void
     {
         $cart = $this->items();

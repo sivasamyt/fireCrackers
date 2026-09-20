@@ -49,6 +49,7 @@ class HomeController extends Controller
                 'products' => $products,
                 'search' => $search,
                 'activeCategory' => $activeCategory,
+                'cartQuantities' => $cart->productQuantities(),
             ]);
         }
 
@@ -71,6 +72,9 @@ class HomeController extends Controller
             'combos' => $combos,
             'giftBoxes' => $giftBoxes,
             'cartCount' => $cart->count(),
+            'cartQuantities' => $cart->productQuantities(),
+            'giftBoxQuantities' => $cart->giftBoxQuantities(),
+            'cartSummary' => $cart->summary(),
             'activeCategory' => $activeCategory,
             'search' => $search,
         ]);
