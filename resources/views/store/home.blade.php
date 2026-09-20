@@ -20,21 +20,25 @@
 </section>
 
 <section id="catalog" class="container py-5">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-3">
         <div>
             <h2 class="brand-font display-5 mb-1 text-warning">Catalog</h2>
             <p class="text-secondary mb-0">Browse firecrackers by category and add favorites to your cart.</p>
         </div>
         <form id="catalog-filter" class="d-flex gap-2 flex-wrap" method="GET" action="{{ route('home') }}">
+            <input type="hidden" name="category" id="catalog-category" value="{{ $activeCategory }}">
             <input type="search" name="q" id="catalog-search" value="{{ $search }}" class="form-control" placeholder="Search name, category, price..." autocomplete="off">
-            <select name="category" id="catalog-category" class="form-select">
-                <option value="">All categories</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->slug }}" @selected($activeCategory === $category->slug)>{{ $category->name }}</option>
-                @endforeach
-            </select>
             <a id="catalog-clear" href="{{ route('home') }}#catalog" class="btn btn-outline-gold {{ ($search !== '' || $activeCategory !== '') ? '' : 'd-none' }}">Clear</a>
         </form>
+    </div>
+
+    <div id="catalog-categories" class="d-flex flex-wrap gap-2 mb-4">
+        <button type="button" class="btn btn-sm catalog-cat-btn {{ $activeCategory === '' ? 'btn-gold' : 'btn-outline-gold' }}" data-category="">All</button>
+        @foreach($categories as $category)
+            <button type="button" class="btn btn-sm catalog-cat-btn {{ $activeCategory === $category->slug ? 'btn-gold' : 'btn-outline-gold' }}" data-category="{{ $category->slug }}">
+                {{ $category->name }}
+            </button>
+        @endforeach
     </div>
 
     <div id="catalog-results">
@@ -166,6 +170,7 @@
     const results = document.getElementById('catalog-results');
     const clearBtn = document.getElementById('catalog-clear');
     const catalog = document.getElementById('catalog');
+    const categoryButtons = document.querySelectorAll('.catalog-cat-btn');
     if (!form || !search || !category || !results) return;
 
     let timer = null;
@@ -175,6 +180,14 @@
         if (!clearBtn) return;
         const active = search.value.trim() !== '' || category.value !== '';
         clearBtn.classList.toggle('d-none', !active);
+    };
+
+    const setActiveCategoryButton = (slug) => {
+        categoryButtons.forEach((btn) => {
+            const isActive = (btn.dataset.category || '') === slug;
+            btn.classList.toggle('btn-gold', isActive);
+            btn.classList.toggle('btn-outline-gold', !isActive);
+        });
     };
 
     const loadCatalog = async () => {
@@ -216,10 +229,15 @@
         timer = setTimeout(loadCatalog, 600);
     });
 
-    category.addEventListener('change', () => {
-        clearTimeout(timer);
-        updateClear();
-        loadCatalog();
+    categoryButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            clearTimeout(timer);
+            const slug = btn.dataset.category || '';
+            category.value = slug;
+            setActiveCategoryButton(slug);
+            updateClear();
+            loadCatalog();
+        });
     });
 })();
 </script>
