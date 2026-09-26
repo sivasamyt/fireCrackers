@@ -36,4 +36,20 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public static function computeLineTotal(float $unitPrice, int $discountPercent, int $quantity): float
+    {
+        $discountedUnit = $unitPrice * (1 - max(0, min(100, $discountPercent)) / 100);
+
+        return round($discountedUnit * $quantity, 2);
+    }
+
+    public function refreshLineTotal(): void
+    {
+        $this->line_total = self::computeLineTotal(
+            (float) $this->unit_price,
+            (int) $this->discount_percent,
+            (int) $this->quantity
+        );
+    }
 }

@@ -77,4 +77,19 @@ class Order extends Model
             $this->pincode,
         ])->filter()->implode(', ');
     }
+
+    public function recalculateTotals(): void
+    {
+        $items = $this->items()->get();
+
+        $subtotal = round($items->sum(fn (OrderItem $item) => (float) $item->unit_price * $item->quantity), 2);
+        $grandTotal = round($items->sum(fn (OrderItem $item) => (float) $item->line_total), 2);
+        $discountTotal = round($subtotal - $grandTotal, 2);
+
+        $this->update([
+            'subtotal' => $subtotal,
+            'discount_total' => $discountTotal,
+            'grand_total' => $grandTotal,
+        ]);
+    }
 }
