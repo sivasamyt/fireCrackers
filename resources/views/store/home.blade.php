@@ -5,10 +5,10 @@
 @section('content')
 <section class="hero">
     <span class="spark" style="top:18%; left:12%;"></span>
-    <span class="spark" style="top:28%; left:72%; animation-delay:.6s;"></span>
+    <span class="spark" style="top:28%; left:82%; animation-delay:.6s;"></span>
     <span class="spark" style="top:62%; left:84%; animation-delay:1.2s;"></span>
     <div class="container py-5">
-        <div class="brand-font hero-brand">FireCrackers</div>
+        <div class="brand-font hero-brand">Royal FireCrackers</div>
         <p class="fs-5 mt-3">Premium sparklers, rockets, and festive packs delivered to your door. Bright nights. Bold celebrations.</p>
         <div class="cta-group d-flex gap-3 mt-4 flex-wrap">
             <a href="#catalog" class="btn btn-gold btn-lg px-4">Shop Now</a>

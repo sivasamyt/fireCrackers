@@ -25,7 +25,6 @@ Route::delete('/cart', [CartController::class, 'destroy'])->name('cart.destroy')
 
 Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/verify', [CheckoutController::class, 'verify'])->name('checkout.verify');
 Route::get('/orders/{order}', [CheckoutController::class, 'show'])->name('orders.show');
 
 Route::middleware('auth')->group(function () {

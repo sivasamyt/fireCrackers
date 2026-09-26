@@ -40,4 +40,8 @@ return [
         'secret' => env('RAZORPAY_SECRET'),
     ],
 
+    'upi' => [
+        'qr_image' => env('UPI_QR_IMAGE', '/images/upi-qr.png'),
+    ],
+
 ];

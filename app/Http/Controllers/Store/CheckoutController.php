@@ -7,7 +7,6 @@ use App\Mail\AdminNewOrderMail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
-use App\Services\RazorpayService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,13 +18,16 @@ use Throwable;
 
 class CheckoutController extends Controller
 {
-    public function create(CartService $cart, RazorpayService $razorpay): View|RedirectResponse
+    public function create(CartService $cart): View|RedirectResponse
     {
         $totals = $cart->totals();
 
         if ($totals['items']->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
+
+        $qrRelative = ltrim((string) config('services.upi.qr_image', '/images/upi-qr.png'), '/');
+        $qrExists = is_file(public_path($qrRelative));
 
         return view('store.checkout', [
             'items' => $totals['items'],
@@ -33,12 +35,12 @@ class CheckoutController extends Controller
             'discountTotal' => $totals['discount_total'],
             'grandTotal' => $totals['grand_total'],
             'cartCount' => $cart->count(),
-            'razorpayEnabled' => $razorpay->isConfigured(),
+            'upiQrUrl' => $qrExists ? asset($qrRelative) : null,
             'user' => auth()->user(),
         ]);
     }
 
-    public function store(Request $request, CartService $cart, RazorpayService $razorpay): RedirectResponse|View
+    public function store(Request $request, CartService $cart): RedirectResponse
     {
         $totals = $cart->totals();
 
@@ -46,7 +48,7 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
-        $rules = [
+        $data = $request->validate([
             'guest_name' => [Rule::requiredIf(! auth()->check()), 'nullable', 'string', 'max:255'],
             'guest_email' => ['nullable', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:20'],
@@ -55,14 +57,8 @@ class CheckoutController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'state' => ['required', 'string', 'max:100'],
             'pincode' => ['required', 'string', 'max:12'],
-            'payment_method' => ['required', Rule::in(['cod', 'razorpay'])],
-        ];
-
-        $data = $request->validate($rules);
-
-        if ($data['payment_method'] === 'razorpay' && ! $razorpay->isConfigured()) {
-            return back()->withInput()->with('error', 'Online payment is not configured. Choose Cash on Delivery.');
-        }
+            'payment_method' => ['required', Rule::in(['cod', 'upi'])],
+        ]);
 
         try {
             $order = DB::transaction(function () use ($data, $totals) {
@@ -116,61 +112,15 @@ class CheckoutController extends Controller
             return back()->withInput()->with('error', 'Could not place order. Please try again.');
         }
 
-        if ($data['payment_method'] === 'cod') {
-            $cart->clear();
-            session()->put('guest_order_ids', array_unique(array_merge(session('guest_order_ids', []), [$order->id])));
-            $this->notifyAdmin($order);
-
-            return redirect()->route('orders.show', $order)->with('success', 'Order placed with Cash on Delivery.');
-        }
-
-        try {
-            $payment = $razorpay->createOrderPayment($order);
-        } catch (Throwable $e) {
-            report($e);
-            $order->update(['status' => 'cancelled', 'payment_status' => 'failed']);
-
-            return redirect()->route('checkout.create')->with('error', 'Unable to start Razorpay payment. Try COD or check Razorpay keys.');
-        }
-
-        return view('store.razorpay', [
-            'order' => $order,
-            'payment' => $payment,
-            'razorpayKey' => config('services.razorpay.key'),
-            'cartCount' => $cart->count(),
-        ]);
-    }
-
-    public function verify(Request $request, CartService $cart, RazorpayService $razorpay): RedirectResponse
-    {
-        $data = $request->validate([
-            'order_id' => ['required', 'exists:orders,id'],
-            'razorpay_payment_id' => ['required', 'string'],
-            'razorpay_order_id' => ['required', 'string'],
-            'razorpay_signature' => ['required', 'string'],
-        ]);
-
-        $order = Order::query()->findOrFail($data['order_id']);
-
-        try {
-            $razorpay->verifyAndMarkPaid(
-                $order,
-                $data['razorpay_payment_id'],
-                $data['razorpay_order_id'],
-                $data['razorpay_signature']
-            );
-        } catch (Throwable $e) {
-            report($e);
-            $order->update(['payment_status' => 'failed']);
-
-            return redirect()->route('checkout.create')->with('error', 'Payment verification failed.');
-        }
-
         $cart->clear();
         session()->put('guest_order_ids', array_unique(array_merge(session('guest_order_ids', []), [$order->id])));
         $this->notifyAdmin($order);
 
-        return redirect()->route('orders.show', $order)->with('success', 'Payment successful. Order confirmed.');
+        $message = $data['payment_method'] === 'upi'
+            ? 'Order placed. Complete UPI payment if you have not already — we will confirm once received.'
+            : 'Order placed with Cash on Delivery.';
+
+        return redirect()->route('orders.show', $order)->with('success', $message);
     }
 
     public function show(Order $order, CartService $cart): View

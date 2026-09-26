@@ -45,7 +45,7 @@
 
 <div class="card card-stat p-3">
     <table class="table mb-0">
-        <thead><tr><th>Order</th><th>Customer</th><th>Payment</th><th>Total</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Payment</th><th>Total</th><th>Status</th><th></th></tr></thead>
         <tbody>
         @forelse($orders as $order)
             @php
@@ -58,6 +58,7 @@
             @endphp
             <tr class="{{ $rowClass }}">
                 <td>{{ $order->order_number }}</td>
+                <td>{{ $order->created_at->format('d M Y, h:i A') }}</td>
                 <td>{{ $order->customerName() }}</td>
                 <td class="text-uppercase">{{ $order->payment_method }} / {{ $order->payment_status }}</td>
                 <td>₹{{ number_format($order->grand_total, 2) }}</td>
@@ -66,7 +67,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="text-muted">No orders match these filters.</td>
+                <td colspan="7" class="text-muted">No orders match these filters.</td>
             </tr>
         @endforelse
         </tbody>
