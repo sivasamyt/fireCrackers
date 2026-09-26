@@ -34,11 +34,21 @@
         <label class="form-label">Stock</label>
         <input type="number" min="0" name="stock" value="{{ old('stock', $product?->stock ?? 0) }}" class="form-control" required>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-4">
         <label class="form-label">Image</label>
         <input type="file" name="image" accept="image/*" class="form-control">
         @if($product?->image_path)
             <div class="mt-2"><img src="{{ $product->image_url }}" alt="" style="height:80px;border-radius:.4rem;"></div>
+        @endif
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Video</label>
+        <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime" class="form-control">
+        <div class="form-text">Max 10MB (MP4, WebM, MOV)</div>
+        @if($product?->video_path)
+            <div class="mt-2">
+                <video src="{{ $product->video_url }}" controls style="max-height:120px;border-radius:.4rem;"></video>
+            </div>
         @endif
     </div>
     <div class="col-md-4 d-flex align-items-end">

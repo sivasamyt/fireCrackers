@@ -19,6 +19,7 @@ class Product extends Model
         'price',
         'discount_percent',
         'image_path',
+        'video_path',
         'stock',
         'is_active',
     ];
@@ -81,5 +82,14 @@ class Product extends Model
         }
 
         return 'https://placehold.co/600x600/0b1220/f5c451?text='.urlencode($this->name);
+    }
+
+    public function getVideoUrlAttribute(): ?string
+    {
+        if ($this->video_path) {
+            return asset('storage/'.$this->video_path);
+        }
+
+        return null;
     }
 }

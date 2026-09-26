@@ -74,6 +74,10 @@ class ProductController extends Controller
             $data['image_path'] = $request->file('image')->store('products', 'public');
         }
 
+        if ($request->hasFile('video')) {
+            $data['video_path'] = $request->file('video')->store('products/videos', 'public');
+        }
+
         $product = Product::query()->create($data);
         $this->syncComponents($request, $product->load('category'));
 
@@ -100,6 +104,13 @@ class ProductController extends Controller
             $data['image_path'] = $request->file('image')->store('products', 'public');
         }
 
+        if ($request->hasFile('video')) {
+            if ($product->video_path) {
+                Storage::disk('public')->delete($product->video_path);
+            }
+            $data['video_path'] = $request->file('video')->store('products/videos', 'public');
+        }
+
         $product->update($data);
         $this->syncComponents($request, $product->fresh('category'));
 
@@ -110,6 +121,10 @@ class ProductController extends Controller
     {
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
+        }
+
+        if ($product->video_path) {
+            Storage::disk('public')->delete($product->video_path);
         }
 
         $product->components()->detach();
@@ -161,6 +176,7 @@ class ProductController extends Controller
             'discount_percent' => ['nullable', 'integer', 'min:0', 'max:100'],
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:4096'],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:10240'],
             'is_active' => ['nullable', 'boolean'],
             'component_ids' => [$isCombo ? 'required' : 'nullable', 'array', 'min:'.($isCombo ? 2 : 0)],
             'component_ids.*' => ['integer', Rule::in($allowedComponentIds)],

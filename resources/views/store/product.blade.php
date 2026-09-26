@@ -2,11 +2,81 @@
 
 @section('title', $product->name.' — FireCrackers')
 
+@push('head')
+<style>
+    .product-media {
+        position: relative;
+        border-radius: .75rem;
+        overflow: hidden;
+        border: 1px solid rgba(245, 196, 81, .25);
+        background: #0b1220;
+    }
+    .product-media-image,
+    .product-media-video {
+        display: block;
+        width: 100%;
+        max-height: 520px;
+        object-fit: cover;
+    }
+    .product-media-video {
+        background: #0b1220;
+        object-fit: contain;
+    }
+    .product-media-play {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 4.25rem;
+        height: 4.25rem;
+        border: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
+        color: #1a1205;
+        font-size: 1.35rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: .2rem;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, .45);
+        cursor: pointer;
+        transition: transform .15s ease, filter .15s ease;
+        z-index: 2;
+    }
+    .product-media-play:hover {
+        transform: translate(-50%, -50%) scale(1.06);
+        filter: brightness(1.05);
+    }
+    .product-media.is-playing .product-media-image,
+    .product-media.is-playing .product-media-play {
+        display: none;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container py-5">
     <div class="row g-4">
         <div class="col-lg-6">
-            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-100 rounded-3 border border-warning border-opacity-25" style="max-height:520px;object-fit:cover;">
+            <div class="product-media" id="product-media" @if($product->video_url) data-has-video="1" @endif>
+                <img
+                    src="{{ $product->image_url }}"
+                    alt="{{ $product->name }}"
+                    class="product-media-image"
+                >
+                @if($product->video_url)
+                    <button type="button" class="product-media-play" id="product-media-play" aria-label="Play video">▶</button>
+                    <video
+                        class="product-media-video d-none"
+                        id="product-media-video"
+                        src="{{ $product->video_url }}"
+                        controls
+                        playsinline
+                        preload="metadata"
+                    ></video>
+                @endif
+            </div>
         </div>
         <div class="col-lg-6">
             <div class="panel h-100">
@@ -70,3 +140,22 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(() => {
+    const media = document.getElementById('product-media');
+    const playBtn = document.getElementById('product-media-play');
+    const video = document.getElementById('product-media-video');
+    if (!media || !playBtn || !video || media.dataset.hasVideo !== '1') return;
+
+    const startPlayback = () => {
+        media.classList.add('is-playing');
+        video.classList.remove('d-none');
+        video.play().catch(() => {});
+    };
+
+    playBtn.addEventListener('click', startPlayback);
+})();
+</script>
+@endpush
