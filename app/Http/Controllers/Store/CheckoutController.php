@@ -26,7 +26,7 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
-        $qrRelative = ltrim((string) config('services.upi.qr_image', '/images/upi-qr.png'), '/');
+        $qrRelative = ltrim((string) config('services.upi.qr_image', '/images/upi-qr.jpeg'), '/');
         $qrExists = is_file(public_path($qrRelative));
 
         return view('store.checkout', [

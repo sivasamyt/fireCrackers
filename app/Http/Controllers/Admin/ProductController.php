@@ -71,11 +71,11 @@ class ProductController extends Controller
         unset($data['component_ids'], $data['component_qty']);
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $request->file('image')->store('products', config('filesystems.media'));
         }
 
         if ($request->hasFile('video')) {
-            $data['video_path'] = $request->file('video')->store('products/videos', 'public');
+            $data['video_path'] = $request->file('video')->store('products/videos', config('filesystems.media'));
         }
 
         $product = Product::query()->create($data);
@@ -99,16 +99,16 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+                Storage::disk(config('filesystems.media'))->delete($product->image_path);
             }
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $request->file('image')->store('products', config('filesystems.media'));
         }
 
         if ($request->hasFile('video')) {
             if ($product->video_path) {
-                Storage::disk('public')->delete($product->video_path);
+                Storage::disk(config('filesystems.media'))->delete($product->video_path);
             }
-            $data['video_path'] = $request->file('video')->store('products/videos', 'public');
+            $data['video_path'] = $request->file('video')->store('products/videos', config('filesystems.media'));
         }
 
         $product->update($data);
@@ -120,11 +120,11 @@ class ProductController extends Controller
     public function destroy(Product $product): RedirectResponse
     {
         if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
+            Storage::disk(config('filesystems.media'))->delete($product->image_path);
         }
 
         if ($product->video_path) {
-            Storage::disk('public')->delete($product->video_path);
+            Storage::disk(config('filesystems.media'))->delete($product->video_path);
         }
 
         $product->components()->detach();

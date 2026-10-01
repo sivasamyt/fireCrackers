@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -78,7 +79,7 @@ class Product extends Model
     public function getImageUrlAttribute(): string
     {
         if ($this->image_path) {
-            return asset('storage/'.$this->image_path);
+            return Storage::disk(config('filesystems.media'))->url($this->image_path);
         }
 
         return 'https://placehold.co/600x600/0b1220/f5c451?text='.urlencode($this->name);
@@ -87,7 +88,7 @@ class Product extends Model
     public function getVideoUrlAttribute(): ?string
     {
         if ($this->video_path) {
-            return asset('storage/'.$this->video_path);
+            return Storage::disk(config('filesystems.media'))->url($this->video_path);
         }
 
         return null;

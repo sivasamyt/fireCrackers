@@ -34,7 +34,7 @@ class GiftBoxController extends Controller
         unset($data['product_ids'], $data['product_qty']);
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('gift-boxes', 'public');
+            $data['image_path'] = $request->file('image')->store('gift-boxes', config('filesystems.media'));
         }
 
         $giftBox = GiftBox::query()->create($data);
@@ -58,9 +58,9 @@ class GiftBoxController extends Controller
 
         if ($request->hasFile('image')) {
             if ($giftBox->image_path) {
-                Storage::disk('public')->delete($giftBox->image_path);
+                Storage::disk(config('filesystems.media'))->delete($giftBox->image_path);
             }
-            $data['image_path'] = $request->file('image')->store('gift-boxes', 'public');
+            $data['image_path'] = $request->file('image')->store('gift-boxes', config('filesystems.media'));
         }
 
         $giftBox->update($data);
@@ -72,7 +72,7 @@ class GiftBoxController extends Controller
     public function destroy(GiftBox $giftBox): RedirectResponse
     {
         if ($giftBox->image_path) {
-            Storage::disk('public')->delete($giftBox->image_path);
+            Storage::disk(config('filesystems.media'))->delete($giftBox->image_path);
         }
 
         $giftBox->products()->detach();

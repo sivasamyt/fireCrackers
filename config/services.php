@@ -41,7 +41,7 @@ return [
     ],
 
     'upi' => [
-        'qr_image' => env('UPI_QR_IMAGE', '/images/upi-qr.png'),
+        'qr_image' => env('UPI_QR_IMAGE', '/images/upi-qr.jpeg'),
         'admin_helper_phone' => env('ADMIN_HELPER_PHONE'),
     ],
 
