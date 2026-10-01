@@ -13,7 +13,17 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminEmail = env('ADMIN_EMAIL', 'admin@firecrackers.test');
+        /*
+        |--------------------------------------------------------------------------
+        | Admin User
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Set ADMIN_EMAIL and ADMIN_PASSWORD in Laravel Cloud environment variables.
+        |
+        */
+
+        $adminEmail = env('ADMIN_EMAIL', 'admin@royalcrackers.test');
         $adminPassword = env('ADMIN_PASSWORD', 'password');
 
         User::query()->updateOrCreate(
@@ -26,31 +36,74 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $categories = [
-            'Sparklers' => 'Hand-held sparkles for celebrations',
-            'Flower Pots' => 'Ground-based colorful fountains',
-            'Rockets' => 'Sky rockets and aerial crackers',
-            'Bombs' => 'Loud sound crackers',
-            'Gift Boxes' => 'Assorted festival packs',
+        /*
+        |--------------------------------------------------------------------------
+        | Categories and Products
+        |--------------------------------------------------------------------------
+        */
+
+        $products = [
+            'Sparklers' => [
+                'description' => 'Hand-held sparkles for celebrations',
+                'price' => 199.00,
+                'discount_percent' => 5,
+                'stock' => 100,
+            ],
+
+            'Flower Pots' => [
+                'description' => 'Ground-based colorful fountains',
+                'price' => 349.00,
+                'discount_percent' => 10,
+                'stock' => 80,
+            ],
+
+            'Rockets' => [
+                'description' => 'Sky rockets and aerial crackers',
+                'price' => 499.00,
+                'discount_percent' => 10,
+                'stock' => 60,
+            ],
+
+            'Bombs' => [
+                'description' => 'Loud sound crackers',
+                'price' => 299.00,
+                'discount_percent' => 5,
+                'stock' => 75,
+            ],
+
+            'Gift Boxes' => [
+                'description' => 'Assorted festival packs',
+                'price' => 999.00,
+                'discount_percent' => 15,
+                'stock' => 40,
+            ],
         ];
 
         $regularProducts = collect();
 
-        foreach ($categories as $name => $description) {
+        foreach ($products as $name => $details) {
             $category = Category::query()->updateOrCreate(
-                ['slug' => Str::slug($name)],
-                ['name' => $name, 'is_active' => true]
+                [
+                    'slug' => Str::slug($name),
+                ],
+                [
+                    'name' => $name,
+                    'is_active' => true,
+                ]
             );
 
             $product = Product::query()->updateOrCreate(
-                ['slug' => Str::slug($name).'-classic'],
+                [
+                    'slug' => Str::slug($name) . '-classic',
+                ],
                 [
                     'category_id' => $category->id,
-                    'name' => $name.' Classic Pack',
-                    'description' => $description.'. Premium quality festive firecrackers.',
-                    'price' => fake()->randomFloat(2, 99, 999),
-                    'discount_percent' => fake()->randomElement([0, 5, 10, 15]),
-                    'stock' => fake()->numberBetween(20, 200),
+                    'name' => $name . ' Classic Pack',
+                    'description' => $details['description']
+                        . '. Premium quality festive firecrackers.',
+                    'price' => $details['price'],
+                    'discount_percent' => $details['discount_percent'],
+                    'stock' => $details['stock'],
                     'is_active' => true,
                 ]
             );
@@ -58,19 +111,38 @@ class DatabaseSeeder extends Seeder
             $regularProducts->push($product);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Combo Category
+        |--------------------------------------------------------------------------
+        */
+
         $comboCategory = Category::query()->updateOrCreate(
-            ['slug' => Product::COMBO_CATEGORY_SLUG],
-            ['name' => 'Combo', 'is_active' => true]
+            [
+                'slug' => Product::COMBO_CATEGORY_SLUG,
+            ],
+            [
+                'name' => 'Combo',
+                'is_active' => true,
+            ]
         );
 
-        if ($regularProducts->count() >= 2) {
+        /*
+        |--------------------------------------------------------------------------
+        | Festival Combo Product
+        |--------------------------------------------------------------------------
+        */
+
+        if ($regularProducts->count() >= 3) {
             $combo = Product::query()->updateOrCreate(
-                ['slug' => 'festival-combo-pack'],
+                [
+                    'slug' => 'festival-combo-pack',
+                ],
                 [
                     'category_id' => $comboCategory->id,
                     'name' => 'Festival Combo Pack',
                     'description' => 'A festive mix of popular crackers at a special combo price.',
-                    'price' => 1499,
+                    'price' => 1499.00,
                     'discount_percent' => 10,
                     'stock' => 50,
                     'is_active' => true,
@@ -78,9 +150,13 @@ class DatabaseSeeder extends Seeder
             );
 
             $sync = [];
+
             foreach ($regularProducts->take(3) as $index => $component) {
-                $sync[$component->id] = ['quantity' => $index === 0 ? 2 : 1];
+                $sync[$component->id] = [
+                    'quantity' => $index === 0 ? 2 : 1,
+                ];
             }
+
             $combo->components()->sync($sync);
         }
     }

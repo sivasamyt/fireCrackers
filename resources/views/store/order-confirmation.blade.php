@@ -9,6 +9,9 @@
         <p class="mb-1">Order number: <strong>{{ $order->order_number }}</strong></p>
         <p class="mb-1">Status: <span class="text-capitalize">{{ $order->status }}</span></p>
         <p class="mb-1">Payment: <span class="text-uppercase">{{ $order->payment_method }}</span> — {{ $order->payment_status }}</p>
+        @if($order->transaction_id)
+            <p class="mb-1">UPI Transaction ID: <strong>{{ $order->transaction_id }}</strong></p>
+        @endif
         <p class="mb-4">Deliver to: {{ $order->fullAddress() }}</p>
 
         <table class="table table-dark table-borderless align-middle">

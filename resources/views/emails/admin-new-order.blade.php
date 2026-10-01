@@ -14,7 +14,12 @@
 
     <h2 style="font-size: 16px; margin-bottom: 8px;">Payment</h2>
     <p style="margin: 0 0 4px;">Method: {{ strtoupper($order->payment_method) }}</p>
-    <p style="margin: 0 0 16px;">Status: {{ $order->payment_status }}</p>
+    <p style="margin: 0 0 4px;">Status: {{ $order->payment_status }}</p>
+    @if($order->transaction_id)
+        <p style="margin: 0 0 16px;">Transaction ID: {{ $order->transaction_id }}</p>
+    @else
+        <p style="margin: 0 0 16px;"></p>
+    @endif
 
     <h2 style="font-size: 16px; margin-bottom: 8px;">Products</h2>
     <table cellpadding="8" cellspacing="0" border="1" style="border-collapse: collapse; width: 100%; max-width: 640px;">

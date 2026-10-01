@@ -36,6 +36,7 @@ class CheckoutController extends Controller
             'grandTotal' => $totals['grand_total'],
             'cartCount' => $cart->count(),
             'upiQrUrl' => $qrExists ? asset($qrRelative) : null,
+            'adminHelperPhone' => config('services.upi.admin_helper_phone'),
             'user' => auth()->user(),
         ]);
     }
@@ -58,10 +59,29 @@ class CheckoutController extends Controller
             'state' => ['required', 'string', 'max:100'],
             'pincode' => ['required', 'string', 'max:12'],
             'payment_method' => ['required', Rule::in(['cod', 'upi'])],
+            'upi_payment_claim' => [
+                Rule::requiredIf($request->input('payment_method') === 'upi'),
+                'nullable',
+                Rule::in(['unpaid', 'paid']),
+            ],
+            'transaction_id' => [
+                Rule::requiredIf(
+                    $request->input('payment_method') === 'upi'
+                    && $request->input('upi_payment_claim') === 'paid'
+                ),
+                'nullable',
+                'string',
+                'max:100',
+            ],
         ]);
 
+        $transactionId = null;
+        if (($data['payment_method'] ?? '') === 'upi' && ($data['upi_payment_claim'] ?? '') === 'paid') {
+            $transactionId = trim((string) ($data['transaction_id'] ?? ''));
+        }
+
         try {
-            $order = DB::transaction(function () use ($data, $totals) {
+            $order = DB::transaction(function () use ($data, $totals, $transactionId) {
                 $order = Order::query()->create([
                     'order_number' => 'FC-'.strtoupper(Str::random(8)),
                     'user_id' => auth()->id(),
@@ -71,6 +91,7 @@ class CheckoutController extends Controller
                     'status' => 'pending',
                     'payment_method' => $data['payment_method'],
                     'payment_status' => 'pending',
+                    'transaction_id' => $transactionId,
                     'subtotal' => $totals['subtotal'],
                     'discount_total' => $totals['discount_total'],
                     'grand_total' => $totals['grand_total'],
@@ -116,9 +137,13 @@ class CheckoutController extends Controller
         session()->put('guest_order_ids', array_unique(array_merge(session('guest_order_ids', []), [$order->id])));
         $this->notifyAdmin($order);
 
-        $message = $data['payment_method'] === 'upi'
-            ? 'Order placed. Complete UPI payment if you have not already — we will confirm once received.'
-            : 'Order placed with Cash on Delivery.';
+        if ($data['payment_method'] === 'upi') {
+            $message = $transactionId
+                ? 'Order placed with UPI transaction ID. We will confirm payment once verified.'
+                : 'Order placed. Complete UPI payment if you have not already — we will confirm once received.';
+        } else {
+            $message = 'Order placed with Cash on Delivery.';
+        }
 
         return redirect()->route('orders.show', $order)->with('success', $message);
     }

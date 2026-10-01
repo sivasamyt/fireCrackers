@@ -16,7 +16,8 @@
         transform: scale(1.02);
         box-shadow: 0 0 0 2px rgba(245, 196, 81, .45);
     }
-    .upi-qr-lightbox {
+    .upi-qr-lightbox,
+    .upi-txn-modal {
         position: fixed;
         inset: 0;
         z-index: 2000;
@@ -27,7 +28,8 @@
         background: rgba(5, 7, 15, .88);
         backdrop-filter: blur(4px);
     }
-    .upi-qr-lightbox.d-none { display: none !important; }
+    .upi-qr-lightbox.d-none,
+    .upi-txn-modal.d-none { display: none !important; }
     .upi-qr-lightbox-inner {
         position: relative;
         max-width: min(90vw, 520px);
@@ -59,17 +61,43 @@
         line-height: 1;
         cursor: pointer;
     }
+    .upi-txn-modal-inner {
+        position: relative;
+        width: min(92vw, 420px);
+        background: rgba(12, 18, 34, .98);
+        border: 1px solid rgba(245, 196, 81, .35);
+        border-radius: .75rem;
+        padding: 1.35rem;
+        color: var(--fc-cream);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    }
+    .upi-txn-modal-inner .form-control {
+        background: #0b1220;
+        border-color: rgba(245,196,81,.25);
+        color: var(--fc-cream);
+    }
+    .upi-claim-box {
+        border: 1px solid rgba(245,196,81,.2);
+        border-radius: .5rem;
+        padding: .85rem 1rem;
+        margin-bottom: 1rem;
+    }
 </style>
 @endpush
 
 @section('content')
-@php($upiSelected = old('payment_method', 'cod') === 'upi')
+@php
+    $upiSelected = old('payment_method', 'cod') === 'upi';
+    $upiClaim = old('upi_payment_claim', 'unpaid');
+@endphp
 <div class="container py-5">
     <h1 class="brand-font display-5 text-warning mb-4">Checkout</h1>
     <div class="row g-4">
         <div class="col-lg-7">
             <form method="POST" action="{{ route('checkout.store') }}" class="panel" id="checkout-form">
                 @csrf
+                <input type="hidden" name="transaction_id" id="transaction_id" value="{{ old('transaction_id') }}">
+
                 @guest
                     <h2 class="h5 mb-3">Contact</h2>
                     <div class="row g-3 mb-3">
@@ -125,13 +153,25 @@
                     <label class="form-check-label" for="upi">UPI</label>
                 </div>
 
+                <div class="upi-claim-box {{ $upiSelected ? '' : 'd-none' }}" id="upi-claim-box">
+                    <div class="fw-semibold mb-2">UPI payment status</div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="upi_payment_claim" id="upi-unpaid" value="unpaid" @checked($upiClaim !== 'paid')>
+                        <label class="form-check-label" for="upi-unpaid">Unpaid — I will pay later / already scanning</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="upi_payment_claim" id="upi-paid" value="paid" @checked($upiClaim === 'paid')>
+                        <label class="form-check-label" for="upi-paid">Paid — I already completed UPI payment</label>
+                    </div>
+                </div>
+
                 @if($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                     </div>
                 @endif
 
-                <button class="btn btn-gold btn-lg">Place Order</button>
+                <button type="submit" class="btn btn-gold btn-lg" id="place-order-btn">Place Order</button>
             </form>
         </div>
         <div class="col-lg-5">
@@ -181,17 +221,51 @@
     </div>
 </div>
 @endif
+
+<div class="upi-txn-modal d-none" id="upi-txn-modal" aria-hidden="true" role="dialog" aria-labelledby="upi-txn-title">
+    <div class="upi-txn-modal-inner" id="upi-txn-modal-inner">
+        <h2 class="h5 text-warning mb-3" id="upi-txn-title">Enter UPI transaction ID</h2>
+        <p class="small text-secondary mb-3">You selected <strong>Paid</strong>. Please provide your UPI transaction / UTR ID to place the order.</p>
+        <label class="form-label" for="upi-txn-input">Transaction ID</label>
+        <input type="text" id="upi-txn-input" class="form-control mb-2" maxlength="100" placeholder="e.g. 123456789012" autocomplete="off">
+        <div class="small text-danger mb-3 d-none" id="upi-txn-error">Transaction ID is required.</div>
+        @if(filled($adminHelperPhone ?? null))
+            <p class="small text-secondary mb-3">Need help? Contact site admin: <strong class="text-warning">{{ $adminHelperPhone }}</strong></p>
+        @else
+            <p class="small text-secondary mb-3">Need help? Contact the site admin for UPI support.</p>
+        @endif
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-gold flex-grow-1" id="upi-txn-cancel">Cancel</button>
+            <button type="button" class="btn btn-gold flex-grow-1" id="upi-txn-confirm">Confirm &amp; Place Order</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 (() => {
+    const form = document.getElementById('checkout-form');
     const panel = document.getElementById('upi-scanner-panel');
-    const radios = document.querySelectorAll('input[name="payment_method"]');
+    const claimBox = document.getElementById('upi-claim-box');
+    const methodRadios = document.querySelectorAll('input[name="payment_method"]');
+    const txnHidden = document.getElementById('transaction_id');
+    const txnModal = document.getElementById('upi-txn-modal');
+    const txnInner = document.getElementById('upi-txn-modal-inner');
+    const txnInput = document.getElementById('upi-txn-input');
+    const txnError = document.getElementById('upi-txn-error');
+    const txnCancel = document.getElementById('upi-txn-cancel');
+    const txnConfirm = document.getElementById('upi-txn-confirm');
+
     const thumb = document.getElementById('upi-qr-thumb');
     const lightbox = document.getElementById('upi-qr-lightbox');
     const closeBtn = document.getElementById('upi-qr-lightbox-close');
     const inner = document.getElementById('upi-qr-lightbox-inner');
+
+    let allowPaidSubmit = false;
+
+    const isUpi = () => document.getElementById('upi')?.checked;
+    const isPaidClaim = () => document.getElementById('upi-paid')?.checked;
 
     const openLightbox = () => {
         if (!lightbox) return;
@@ -204,35 +278,103 @@
         if (!lightbox) return;
         lightbox.classList.add('d-none');
         lightbox.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
+        if (txnModal?.classList.contains('d-none')) {
+            document.body.style.overflow = '';
+        }
     };
 
-    if (panel && radios.length) {
-        const sync = () => {
-            const upi = document.getElementById('upi')?.checked;
-            panel.classList.toggle('d-none', !upi);
-            if (!upi) closeLightbox();
-        };
-        radios.forEach((radio) => radio.addEventListener('change', sync));
-        sync();
+    const openTxnModal = () => {
+        if (!txnModal) return;
+        txnError?.classList.add('d-none');
+        if (txnInput) {
+            txnInput.value = txnHidden?.value || '';
+            txnInput.focus();
+        }
+        txnModal.classList.remove('d-none');
+        txnModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeTxnModal = () => {
+        if (!txnModal) return;
+        txnModal.classList.add('d-none');
+        txnModal.setAttribute('aria-hidden', 'true');
+        if (lightbox?.classList.contains('d-none') !== false) {
+            document.body.style.overflow = '';
+        }
+        allowPaidSubmit = false;
+    };
+
+    const syncPaymentUi = () => {
+        const upi = isUpi();
+        panel?.classList.toggle('d-none', !upi);
+        claimBox?.classList.toggle('d-none', !upi);
+        if (!upi) {
+            closeLightbox();
+            closeTxnModal();
+            if (txnHidden) txnHidden.value = '';
+        }
+    };
+
+    methodRadios.forEach((radio) => radio.addEventListener('change', syncPaymentUi));
+    syncPaymentUi();
+
+    form?.addEventListener('submit', (e) => {
+        if (!isUpi() || !isPaidClaim()) {
+            if (txnHidden && !isPaidClaim()) txnHidden.value = '';
+            return;
+        }
+
+        if (allowPaidSubmit && txnHidden?.value.trim()) {
+            return;
+        }
+
+        e.preventDefault();
+        openTxnModal();
+        alert('Please enter your UPI transaction ID to continue.');
+    });
+
+    txnConfirm?.addEventListener('click', () => {
+        const value = (txnInput?.value || '').trim();
+        if (!value) {
+            txnError?.classList.remove('d-none');
+            txnInput?.focus();
+            return;
+        }
+        if (txnHidden) txnHidden.value = value;
+        allowPaidSubmit = true;
+        closeTxnModal();
+        form?.requestSubmit();
+    });
+
+    txnCancel?.addEventListener('click', closeTxnModal);
+    txnModal?.addEventListener('click', (e) => {
+        if (e.target === txnModal) closeTxnModal();
+    });
+    txnInner?.addEventListener('click', (e) => e.stopPropagation());
+
+    if (thumb && lightbox) {
+        thumb.addEventListener('click', openLightbox);
+        thumb.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openLightbox();
+            }
+        });
+        closeBtn?.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+        inner?.addEventListener('click', (e) => e.stopPropagation());
     }
 
-    if (!thumb || !lightbox) return;
-
-    thumb.addEventListener('click', openLightbox);
-    thumb.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openLightbox();
-        }
-    });
-    closeBtn?.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-    inner?.addEventListener('click', (e) => e.stopPropagation());
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !lightbox.classList.contains('d-none')) {
+        if (e.key !== 'Escape') return;
+        if (txnModal && !txnModal.classList.contains('d-none')) {
+            closeTxnModal();
+            return;
+        }
+        if (lightbox && !lightbox.classList.contains('d-none')) {
             closeLightbox();
         }
     });

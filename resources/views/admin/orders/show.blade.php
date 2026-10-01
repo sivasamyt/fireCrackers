@@ -70,6 +70,9 @@
         <div class="card card-stat p-3 mb-3">
             <h2 class="h5">Payment status</h2>
             <p class="mb-2 text-uppercase small text-muted">Method: {{ $order->payment_method }}</p>
+            @if($order->transaction_id)
+                <p class="mb-2 small">Transaction ID: <strong>{{ $order->transaction_id }}</strong></p>
+            @endif
             <form method="POST" action="{{ route('admin.orders.payment-status', $order) }}">
                 @csrf @method('PATCH')
                 <select name="payment_status" class="form-select mb-3">
