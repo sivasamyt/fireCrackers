@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'FireCrackers')</title>
+    <title>@yield('title', 'RoyalCrackers')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -319,7 +319,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-store sticky-top">
     <div class="container">
-        <a class="navbar-brand brand-font fs-3" href="{{ route('home') }}">FireCrackers</a>
+        <a class="navbar-brand brand-font fs-3" href="{{ route('home') }}">Royal Crackers</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -387,7 +387,7 @@
 
 <footer class="footer-store">
     <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
-        <div class="brand-font fs-4 text-warning">FireCrackers</div>
+        <div class="brand-font fs-4 text-warning">RoyalCrackers</div>
         <div>Celebrate safely. Follow local firework regulations.</div>
     </div>
 </footer>

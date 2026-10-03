@@ -1,6 +1,6 @@
 @extends('layouts.store')
 
-@section('title', 'FireCrackers — Festival Fireworks Shop')
+@section('title', 'Royal Crackers — Festival Fireworks Shop')
 
 @section('content')
 <section class="hero">

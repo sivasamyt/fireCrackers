@@ -1,6 +1,6 @@
 @extends('layouts.store')
 
-@section('title', 'Checkout — FireCrackers')
+@section('title', 'Checkout — RoyalCrackers')
 
 @push('head')
 <style>
