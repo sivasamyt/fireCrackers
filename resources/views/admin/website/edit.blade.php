@@ -38,7 +38,7 @@
     <h2 class="h5 mb-1">Theme</h2>
     <p class="text-muted small mb-4">Choose how the storefront looks for every visitor. The admin panel is not affected.</p>
 
-    <form method="POST" action="{{ route('admin.website.update') }}">
+    <form method="POST" action="{{ route('admin.website.update') }}" enctype="multipart/form-data">
         @csrf @method('PUT')
 
         <div class="row g-3 mb-4">
@@ -70,6 +70,23 @@
         @error('theme')
             <div class="text-danger small mb-3">{{ $message }}</div>
         @enderror
+
+        <h2 class="h5 mb-1 mt-2">Logo</h2>
+        <p class="text-muted small mb-3">Shown in the store header and on the "Show All" category tile.</p>
+        @if($logoUrl)
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <img src="{{ $logoUrl }}" alt="Logo" class="rounded border" style="width:72px;height:72px;object-fit:contain">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remove_logo" value="1" id="remove_logo">
+                    <label class="form-check-label" for="remove_logo">Remove logo</label>
+                </div>
+            </div>
+        @endif
+        <input type="file" name="logo" accept="image/*" class="form-control mb-1 @error('logo') is-invalid @enderror">
+        @error('logo')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+        <div class="mb-4"></div>
 
         <button class="btn btn-dark">Save</button>
         <a href="{{ route('home') }}" target="_blank" class="btn btn-link">View Store</a>

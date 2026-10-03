@@ -33,10 +33,11 @@
 
 <div class="card card-stat p-3">
     <table class="table mb-0">
-        <thead><tr><th>Name</th><th>Slug</th><th>Products</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Status</th><th></th></tr></thead>
         <tbody>
         @foreach($categories as $category)
             <tr>
+                <td><img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="rounded border" style="width:40px;height:40px;object-fit:cover"></td>
                 <td>{{ $category->name }}</td>
                 <td>{{ $category->slug }}</td>
                 <td>{{ $category->products_count }}</td>

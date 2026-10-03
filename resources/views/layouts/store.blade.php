@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 @php($theme = \App\Models\Setting::theme())
+@php($siteLogo = \App\Models\Setting::logoUrl())
 <html lang="en" data-theme="{{ $theme }}" data-bs-theme="{{ $theme }}">
 <head>
     <meta charset="utf-8">
@@ -214,7 +215,12 @@
             display: inline-flex;
             align-items: center;
             gap: .35rem;
+            position: relative;
+            padding: .5rem .25rem;
+            color: var(--fc-text);
+            text-decoration: none;
         }
+        .nav-cart-link:hover { color: var(--fc-gold); }
         .nav-cart-badge {
             display: inline-flex;
             align-items: center;
@@ -227,6 +233,19 @@
             color: var(--fc-on-accent);
             font-size: .75rem;
             font-weight: 700;
+        }
+        @media (max-width: 991.98px) {
+            .nav-cart-link { padding: .4rem .5rem; }
+            .nav-cart-badge {
+                position: absolute;
+                top: -2px;
+                right: -6px;
+                min-width: 1.1rem;
+                height: 1.1rem;
+                padding: 0 .25rem;
+                font-size: .65rem;
+                border-radius: 999px;
+            }
         }
         .nav-cart-dropdown {
             position: absolute;
@@ -251,6 +270,17 @@
             opacity: 1;
             visibility: visible;
             transform: none;
+        }
+        @media (max-width: 991.98px) {
+            .nav-cart { position: static; }
+            .nav-cart-dropdown {
+                top: 100%;
+                left: .75rem;
+                right: .75rem;
+                width: auto;
+                max-height: calc(100vh - 5rem);
+                overflow-y: auto;
+            }
         }
         .nav-cart-items {
             max-height: 16rem;
@@ -312,43 +342,54 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-store sticky-top">
     <div class="container">
-        <a class="navbar-brand brand-font fs-3" href="{{ route('home') }}">Royal Crackers</a>
+        <a class="navbar-brand brand-font fs-3 d-flex align-items-center gap-2" href="{{ route('home') }}">
+            @if($siteLogo)
+                <img src="{{ $siteLogo }}" alt="Royal Crackers" class="site-logo">
+            @endif
+            Royal Crackers
+        </a>
+        <div class="nav-cart ms-auto me-2 me-lg-0 ms-lg-3 order-lg-last" id="nav-cart">
+            <a class="nav-cart-link" href="{{ route('cart.index') }}" id="nav-cart-link" aria-label="Cart">
+                <svg class="nav-cart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span class="d-none d-lg-inline">Cart</span>
+                <span class="nav-cart-badge" id="nav-cart-count">{{ $cartCount ?? 0 }}</span>
+            </a>
+            <div class="nav-cart-dropdown" id="nav-cart-dropdown" role="menu" aria-label="Cart preview">
+                <div class="nav-cart-items" id="nav-cart-items">
+                    @php($summary = $cartSummary ?? ['items' => [], 'grand_total' => 0, 'cart_count' => 0])
+                    @forelse(($summary['items'] ?? []) as $item)
+                        <div class="nav-cart-item">
+                            <img src="{{ $item['image_url'] }}" alt="">
+                            <div class="nav-cart-item-meta">
+                                <div class="nav-cart-item-name">{{ $item['name'] }}</div>
+                                <div class="nav-cart-item-sub">Qty {{ $item['quantity'] }} · ₹{{ number_format($item['unit_price'], 2) }}</div>
+                            </div>
+                            <div class="nav-cart-item-total">₹{{ number_format($item['line_total'], 2) }}</div>
+                        </div>
+                    @empty
+                        <div class="nav-cart-empty">Your cart is empty</div>
+                    @endforelse
+                </div>
+                <div class="nav-cart-footer {{ ($summary['cart_count'] ?? 0) > 0 ? '' : 'd-none' }}" id="nav-cart-footer">
+                    <div class="nav-cart-total">
+                        <span>Total</span>
+                        <span class="text-warning" id="nav-cart-total">₹{{ number_format($summary['grand_total'] ?? 0, 2) }}</span>
+                    </div>
+                    <a href="{{ route('checkout.create') }}" class="btn btn-gold w-100 btn-sm">Checkout</a>
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-gold w-100 btn-sm mt-2">View cart</a>
+                </div>
+            </div>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navMain">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#catalog">Shop</a></li>
-                <li class="nav-item nav-cart" id="nav-cart">
-                    <a class="nav-link nav-cart-link" href="{{ route('cart.index') }}" id="nav-cart-link">
-                        Cart <span class="nav-cart-badge" id="nav-cart-count">{{ $cartCount ?? 0 }}</span>
-                    </a>
-                    <div class="nav-cart-dropdown" id="nav-cart-dropdown" role="menu" aria-label="Cart preview">
-                        <div class="nav-cart-items" id="nav-cart-items">
-                            @php($summary = $cartSummary ?? ['items' => [], 'grand_total' => 0, 'cart_count' => 0])
-                            @forelse(($summary['items'] ?? []) as $item)
-                                <div class="nav-cart-item">
-                                    <img src="{{ $item['image_url'] }}" alt="">
-                                    <div class="nav-cart-item-meta">
-                                        <div class="nav-cart-item-name">{{ $item['name'] }}</div>
-                                        <div class="nav-cart-item-sub">Qty {{ $item['quantity'] }} · ₹{{ number_format($item['unit_price'], 2) }}</div>
-                                    </div>
-                                    <div class="nav-cart-item-total">₹{{ number_format($item['line_total'], 2) }}</div>
-                                </div>
-                            @empty
-                                <div class="nav-cart-empty">Your cart is empty</div>
-                            @endforelse
-                        </div>
-                        <div class="nav-cart-footer {{ ($summary['cart_count'] ?? 0) > 0 ? '' : 'd-none' }}" id="nav-cart-footer">
-                            <div class="nav-cart-total">
-                                <span>Total</span>
-                                <span class="text-warning" id="nav-cart-total">₹{{ number_format($summary['grand_total'] ?? 0, 2) }}</span>
-                            </div>
-                            <a href="{{ route('checkout.create') }}" class="btn btn-gold w-100 btn-sm">Checkout</a>
-                            <a href="{{ route('cart.index') }}" class="btn btn-outline-gold w-100 btn-sm mt-2">View cart</a>
-                        </div>
-                    </div>
-                </li>
                 @auth
                     @if(auth()->user()->isAdmin())
                         <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a></li>
@@ -380,7 +421,12 @@
 
 <footer class="footer-store">
     <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
-        <div class="brand-font fs-4 text-warning">RoyalCrackers</div>
+        <div class="brand-font fs-4 text-warning d-flex align-items-center gap-2">
+            @if($siteLogo)
+                <img src="{{ $siteLogo }}" alt="RoyalCrackers" class="site-logo site-logo-sm">
+            @endif
+            RoyalCrackers
+        </div>
         <div>Celebrate safely. Follow local firework regulations.</div>
     </div>
 </footer>
@@ -471,6 +517,22 @@
         const qtyEl = el.querySelector('[data-cart-qty]');
         const stock = parseInt(el.dataset.stock || '0', 10);
 
+        if (el.hasAttribute('data-cart-inline')) {
+            const maxQty = Math.min(50, stock);
+            const input = el.querySelector('[data-cart-input]');
+            const minus = el.querySelector('[data-cart-minus]');
+            const plus = el.querySelector('[data-cart-plus]');
+            if (input) input.value = qty > 0 ? String(qty) : '';
+            if (minus) minus.disabled = qty <= 0;
+            if (plus) plus.disabled = qty >= maxQty;
+
+            const totalCell = el.closest('[data-catalog-row]')?.querySelector('[data-row-total]');
+            if (totalCell) {
+                totalCell.textContent = formatMoney(parseFloat(totalCell.dataset.unitPrice || '0') * qty);
+            }
+            return;
+        }
+
         const priceRow = el.closest('[data-price-row]')
             || el.closest('.product-card, .panel, .modal-content')?.querySelector('[data-price-row]');
         if (priceRow) {
@@ -547,14 +609,48 @@
     const withBusy = async (el, fn) => {
         if (el.dataset.busy === '1') return;
         el.dataset.busy = '1';
+        el.classList.add('is-busy');
         try {
             await fn();
         } catch (e) {
             console.error(e);
+            setControlQty(el, parseInt(el.dataset.quantity || '0', 10));
         } finally {
             el.dataset.busy = '0';
+            el.classList.remove('is-busy');
         }
     };
+
+    const setQuantity = (el, next) => withBusy(el, async () => {
+        const current = parseInt(el.dataset.quantity || '0', 10);
+        if (next === current) {
+            setControlQty(el, current);
+            return;
+        }
+        const summary = current === 0
+            ? await cartRequest(routes.store, 'POST', { ...linePayload(el), quantity: next })
+            : await cartRequest(routes.update, 'PATCH', { ...linePayload(el), quantity: next });
+        applySummary(summary);
+    });
+
+    document.addEventListener('change', (e) => {
+        const input = e.target.closest('[data-cart-input]');
+        if (!input) return;
+        const el = input.closest('[data-cart-control]');
+        if (!el) return;
+        const stock = parseInt(el.dataset.stock || '0', 10);
+        let next = parseInt(input.value, 10);
+        if (Number.isNaN(next)) next = 0;
+        next = Math.max(0, Math.min(50, stock, next));
+        setQuantity(el, next);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.closest('[data-cart-input]')) {
+            e.preventDefault();
+            e.target.blur();
+        }
+    });
 
     document.addEventListener('click', (e) => {
         const addBtn = e.target.closest('[data-cart-add]');
@@ -581,13 +677,7 @@
             const current = parseInt(el.dataset.quantity || '0', 10);
             const next = Math.min(50, stock, current + 1);
             if (next === current) return;
-            withBusy(el, async () => {
-                const summary = await cartRequest(routes.update, 'PATCH', {
-                    ...linePayload(el),
-                    quantity: next,
-                });
-                applySummary(summary);
-            });
+            setQuantity(el, next);
             return;
         }
 
@@ -598,13 +688,8 @@
             if (!el) return;
             const current = parseInt(el.dataset.quantity || '0', 10);
             const next = Math.max(0, current - 1);
-            withBusy(el, async () => {
-                const summary = await cartRequest(routes.update, 'PATCH', {
-                    ...linePayload(el),
-                    quantity: next,
-                });
-                applySummary(summary);
-            });
+            if (next === current) return;
+            setQuantity(el, next);
         }
     });
 

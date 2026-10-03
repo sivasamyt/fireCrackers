@@ -8,6 +8,7 @@ use App\Imports\CategoriesImport;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -64,11 +65,15 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
         Category::query()->create([
             'name' => $data['name'],
             'slug' => Str::slug($data['name']).'-'.Str::lower(Str::random(4)),
+            'image_path' => $request->hasFile('image')
+                ? $request->file('image')->store('categories', config('filesystems.media'))
+                : null,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -85,12 +90,25 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
 
-        $category->update([
+        $attributes = [
             'name' => $data['name'],
             'is_active' => $request->boolean('is_active'),
-        ]);
+        ];
+
+        if ($request->hasFile('image') || $request->boolean('remove_image')) {
+            if ($category->image_path) {
+                Storage::disk(config('filesystems.media'))->delete($category->image_path);
+            }
+            $attributes['image_path'] = $request->hasFile('image')
+                ? $request->file('image')->store('categories', config('filesystems.media'))
+                : null;
+        }
+
+        $category->update($attributes);
 
         return redirect()->route('admin.categories.index')->with('success', 'Category updated.');
     }
@@ -99,6 +117,10 @@ class CategoryController extends Controller
     {
         if ($category->products()->exists()) {
             return back()->with('error', 'Cannot delete a category that has products.');
+        }
+
+        if ($category->image_path) {
+            Storage::disk(config('filesystems.media'))->delete($category->image_path);
         }
 
         $category->delete();

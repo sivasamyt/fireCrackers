@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class Setting extends Model
@@ -38,5 +39,12 @@ class Setting extends Model
         $theme = static::get('theme', 'dark');
 
         return in_array($theme, self::THEMES, true) ? $theme : 'dark';
+    }
+
+    public static function logoUrl(): ?string
+    {
+        $path = static::get('logo_path');
+
+        return $path ? Storage::disk(config('filesystems.media'))->url($path) : null;
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,28 +15,43 @@ class ProductController extends Controller
     public function index(Request $request, CartService $cart): View
     {
         $search = $request->string('q')->toString();
+        $categorySlug = $request->string('category')->toString();
 
         $products = Product::query()
             ->with('category')
             ->where('is_active', true)
-            ->whereDoesntHave('category', fn ($q) => $q->where('slug', Product::COMBO_CATEGORY_SLUG))
+            ->whereHas('category', fn ($q) => $q
+                ->where('is_active', true)
+                ->where('slug', '!=', Product::COMBO_CATEGORY_SLUG))
+            ->when($categorySlug !== '', function ($query) use ($categorySlug) {
+                $query->whereHas('category', fn ($q) => $q->where('slug', $categorySlug));
+            })
             ->when($search !== '', function ($query) use ($search) {
                 $query->where('name', 'like', '%'.$search.'%');
             })
-            ->latest()
-            ->paginate(12)
-            ->appends($request->only('q'));
+            ->orderBy('name')
+            ->get();
 
         if ($request->boolean('partial')) {
-            return view('store.partials.catalog-results', [
+            return view('store.partials.catalog-table', [
                 'products' => $products,
-                'search' => $search,
                 'cartQuantities' => $cart->productQuantities(),
             ]);
         }
 
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->where('slug', '!=', Product::COMBO_CATEGORY_SLUG)
+            ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->orderBy('name')
+            ->get();
+
         return view('store.products.index', [
             'products' => $products,
+            'categories' => $categories,
+            'totalCount' => $categories->sum('products_count'),
+            'activeCategory' => $categorySlug,
+            'siteLogo' => Setting::logoUrl(),
             'search' => $search,
             'cartCount' => $cart->count(),
             'cartQuantities' => $cart->productQuantities(),
