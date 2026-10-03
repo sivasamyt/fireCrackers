@@ -1,0 +1,29 @@
+---
+description: Dark/light theme CSS convention for storefront and auth pages
+globs: resources/views/**/*.blade.php,public/css/**/*.css
+alwaysApply: false
+---
+
+# Theme CSS convention
+
+The storefront and auth pages support a Dark and a Light theme, chosen in Admin > Website.
+The layouts render `<html data-theme="dark|light" data-bs-theme="dark|light">` and load `public/css/theme.css`.
+
+## Rules
+
+1. Never hard-code hex/rgb text or background colors in views. Use the tokens from `public/css/theme.css`:
+   - Backgrounds: `--fc-body-bg`, `--fc-surface`, `--fc-panel`, `--fc-input-bg`, `--fc-img-bg`, `--fc-nav-bg`, `--fc-dropdown-bg`, `--fc-overlay-bg`
+   - Text: `--fc-text`, `--fc-heading`, `--fc-muted`, `--fc-link`, `--fc-link-hover`, `--fc-accent`, `--fc-on-accent`
+   - Borders/shadows: `--fc-border`, `--fc-border-soft`, `--fc-border-strong`, `--fc-focus-ring`, `--fc-shadow`
+   - Brand gradient: `var(--fc-gold)` to `var(--fc-amber)`
+2. When a section needs colors that differ per theme, write both selectors:
+
+```css
+[data-theme="dark"]  .my-section { background: #0f1626; color: #f7f1e3; }
+[data-theme="light"] .my-section { background: #fff8ec; color: #1f2433; }
+```
+
+3. Any new token must be added to both the dark and the light block in `public/css/theme.css`.
+4. Avoid dark-only or light-only Bootstrap classes (`table-dark`, `text-dark`, `bg-white`, `text-white`, `bg-dark`). Prefer theme-neutral classes (`table`, `text-body`, `text-secondary`) or tokens.
+5. Exceptions: QR codes and similar scannable images keep a white background.
+6. Store pages extend `layouts.store`; auth pages use `layouts.guest`. Both already apply the theme, so new pages extending them inherit it automatically.

@@ -14,7 +14,7 @@
         @endif
         <p class="mb-4">Deliver to: {{ $order->fullAddress() }}</p>
 
-        <table class="table table-dark table-borderless align-middle">
+        <table class="table table-borderless align-middle">
             <thead>
             <tr><th>Item</th><th>Qty</th><th>Total</th></tr>
             </thead>

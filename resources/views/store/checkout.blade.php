@@ -14,7 +14,7 @@
     }
     .upi-qr-thumb:hover {
         transform: scale(1.02);
-        box-shadow: 0 0 0 2px rgba(245, 196, 81, .45);
+        box-shadow: 0 0 0 2px var(--fc-border-strong);
     }
     .upi-qr-lightbox,
     .upi-txn-modal {
@@ -25,7 +25,7 @@
         align-items: center;
         justify-content: center;
         padding: 1.5rem;
-        background: rgba(5, 7, 15, .88);
+        background: var(--fc-overlay-bg);
         backdrop-filter: blur(4px);
     }
     .upi-qr-lightbox.d-none,
@@ -55,7 +55,7 @@
         border: 0;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
-        color: #1a1205;
+        color: var(--fc-on-accent);
         font-weight: 700;
         font-size: 1.25rem;
         line-height: 1;
@@ -64,20 +64,20 @@
     .upi-txn-modal-inner {
         position: relative;
         width: min(92vw, 420px);
-        background: rgba(12, 18, 34, .98);
-        border: 1px solid rgba(245, 196, 81, .35);
+        background: var(--fc-dropdown-bg);
+        border: 1px solid var(--fc-border-strong);
         border-radius: .75rem;
         padding: 1.35rem;
-        color: var(--fc-cream);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+        color: var(--fc-text);
+        box-shadow: var(--fc-shadow);
     }
     .upi-txn-modal-inner .form-control {
-        background: #0b1220;
-        border-color: rgba(245,196,81,.25);
-        color: var(--fc-cream);
+        background-color: var(--fc-input-bg);
+        border-color: var(--fc-border);
+        color: var(--fc-text);
     }
     .upi-claim-box {
-        border: 1px solid rgba(245,196,81,.2);
+        border: 1px solid var(--fc-border);
         border-radius: .5rem;
         padding: .85rem 1rem;
         margin-bottom: 1rem;

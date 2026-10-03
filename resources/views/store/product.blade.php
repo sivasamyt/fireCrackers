@@ -8,8 +8,8 @@
         position: relative;
         border-radius: .75rem;
         overflow: hidden;
-        border: 1px solid rgba(245, 196, 81, .25);
-        background: #0b1220;
+        border: 1px solid var(--fc-border);
+        background: var(--fc-img-bg);
     }
     .product-media-image,
     .product-media-video {
@@ -19,7 +19,7 @@
         object-fit: cover;
     }
     .product-media-video {
-        background: #0b1220;
+        background: var(--fc-img-bg);
         object-fit: contain;
     }
     .product-media-play {
@@ -32,7 +32,7 @@
         border: 0;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
-        color: #1a1205;
+        color: var(--fc-on-accent);
         font-size: 1.35rem;
         line-height: 1;
         display: inline-flex;

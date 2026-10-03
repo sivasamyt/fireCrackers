@@ -1,0 +1,241 @@
+/*
+ * RoyalCrackers theme tokens
+ * ---------------------------------------------------------------------------
+ * The active theme comes from Admin > Website and is rendered as
+ * <html data-theme="dark|light" data-bs-theme="dark|light">.
+ *
+ * Convention for every page:
+ *   1. Use var(--fc-*) tokens for all colors (text, backgrounds, borders).
+ *      Never hard-code a hex text/background color in a view.
+ *   2. If a section needs colors that differ per theme, write both versions:
+ *
+ *        [data-theme="dark"]  .my-section { background: #0f1626; color: #f7f1e3; }
+ *        [data-theme="light"] .my-section { background: #fff8ec; color: #1f2433; }
+ *
+ *   3. New tokens must be added to BOTH blocks below.
+ */
+
+/* ===== Dark theme (default) ============================================= */
+:root,
+[data-theme="dark"] {
+    --fc-gold: #f5c451;
+    --fc-amber: #ff8a3d;
+    --fc-cream: #f7f1e3;
+
+    /* Backgrounds */
+    --fc-body-bg:
+        radial-gradient(ellipse at 20% 0%, rgba(255,138,61,.18), transparent 45%),
+        radial-gradient(ellipse at 80% 10%, rgba(245,196,81,.12), transparent 40%),
+        linear-gradient(180deg, #05070f 0%, #0c1424 45%, #10182b 100%);
+    --fc-surface: rgba(16,24,43,.72);
+    --fc-panel: rgba(16,24,43,.85);
+    --fc-input-bg: #0b1220;
+    --fc-img-bg: #0b1220;
+    --fc-nav-bg: rgba(7,11,22,.85);
+    --fc-dropdown-bg: rgba(12,18,34,.98);
+    --fc-page-bg: rgba(16,24,43,.9);
+    --fc-page-disabled-bg: rgba(11,18,32,.7);
+    --fc-overlay-bg: rgba(5,7,15,.88);
+
+    /* Text */
+    --fc-text: #f7f1e3;
+    --fc-heading: #f7f1e3;
+    --fc-muted: #9aa3b8;
+    --fc-link: #f5c451;
+    --fc-link-hover: #ff8a3d;
+    --fc-accent: #f5c451;
+    --fc-on-accent: #1a1205;
+    --fc-on-gold: var(--fc-on-accent);
+
+    /* Borders & shadows */
+    --fc-border: rgba(245,196,81,.2);
+    --fc-border-soft: rgba(245,196,81,.12);
+    --fc-border-strong: rgba(245,196,81,.45);
+    --fc-focus-ring: rgba(245,196,81,.2);
+    --fc-shadow: 0 16px 40px rgba(0,0,0,.45);
+
+    /* Hero */
+    --fc-hero-overlay: linear-gradient(90deg, rgba(5,7,15,.92) 0%, rgba(5,7,15,.55) 45%, rgba(5,7,15,.25) 100%);
+    --fc-hero-title: #f5c451;
+    --fc-hero-title-glow: rgba(245,196,81,.35);
+    --fc-hero-text: #e8e2d4;
+
+    /* Bootstrap mapping */
+    --bs-body-color: var(--fc-text);
+    --bs-body-color-rgb: 247,241,227;
+    --bs-body-bg: #0c1424;
+    --bs-heading-color: var(--fc-heading);
+    --bs-emphasis-color: #ffffff;
+    --bs-secondary-color: var(--fc-muted);
+    --bs-tertiary-color: var(--fc-muted);
+    --bs-secondary-bg: #10182b;
+    --bs-tertiary-bg: #0b1220;
+    --bs-link-color: var(--fc-link);
+    --bs-link-color-rgb: 245,196,81;
+    --bs-link-hover-color: var(--fc-link-hover);
+    --bs-link-hover-color-rgb: 255,138,61;
+    --bs-border-color: var(--fc-border);
+}
+
+/* ===== Light theme ====================================================== */
+[data-theme="light"] {
+    --fc-gold: #c98a00;
+    --fc-amber: #e8742a;
+    --fc-cream: #f7f1e3;
+
+    /* Backgrounds */
+    --fc-body-bg:
+        radial-gradient(ellipse at 20% 0%, rgba(255,138,61,.10), transparent 45%),
+        radial-gradient(ellipse at 80% 10%, rgba(245,196,81,.12), transparent 40%),
+        linear-gradient(180deg, #fffaf0 0%, #fbf5e8 50%, #f7f1e3 100%);
+    --fc-surface: #ffffff;
+    --fc-panel: #ffffff;
+    --fc-input-bg: #ffffff;
+    --fc-img-bg: #f3ede0;
+    --fc-nav-bg: rgba(255,255,255,.92);
+    --fc-dropdown-bg: #ffffff;
+    --fc-page-bg: #ffffff;
+    --fc-page-disabled-bg: #f3efe6;
+    --fc-overlay-bg: rgba(31,36,51,.55);
+
+    /* Text */
+    --fc-text: #1f2433;
+    --fc-heading: #141824;
+    --fc-muted: #5f6675;
+    --fc-link: #a86f00;
+    --fc-link-hover: #d4621c;
+    --fc-accent: #b07800;
+    --fc-on-accent: #1a1205;
+    --fc-on-gold: var(--fc-on-accent);
+
+    /* Borders & shadows */
+    --fc-border: rgba(176,120,0,.25);
+    --fc-border-soft: rgba(176,120,0,.14);
+    --fc-border-strong: rgba(176,120,0,.55);
+    --fc-focus-ring: rgba(201,138,0,.2);
+    --fc-shadow: 0 16px 40px rgba(31,36,51,.12);
+
+    /* Hero */
+    --fc-hero-overlay: linear-gradient(90deg, rgba(255,250,240,.95) 0%, rgba(255,250,240,.8) 45%, rgba(255,250,240,.45) 100%);
+    --fc-hero-title: #b07800;
+    --fc-hero-title-glow: rgba(201,138,0,.18);
+    --fc-hero-text: #2b3040;
+
+    /* Bootstrap mapping */
+    --bs-body-color: var(--fc-text);
+    --bs-body-color-rgb: 31,36,51;
+    --bs-body-bg: #fffaf0;
+    --bs-heading-color: var(--fc-heading);
+    --bs-emphasis-color: #000000;
+    --bs-secondary-color: var(--fc-muted);
+    --bs-tertiary-color: var(--fc-muted);
+    --bs-secondary-bg: #f3efe6;
+    --bs-tertiary-bg: #faf6ee;
+    --bs-link-color: var(--fc-link);
+    --bs-link-color-rgb: 168,111,0;
+    --bs-link-hover-color: var(--fc-link-hover);
+    --bs-link-hover-color-rgb: 212,98,28;
+    --bs-border-color: var(--fc-border);
+}
+
+/* ===== Theme-aware utility fixes ======================================== */
+[data-theme] .text-warning { color: var(--fc-accent) !important; }
+[data-theme] .text-secondary,
+[data-theme] .text-muted { color: var(--fc-muted) !important; }
+[data-theme] .text-body { color: var(--fc-text) !important; }
+[data-theme] .border-secondary { border-color: var(--fc-border) !important; }
+[data-theme] hr { border-color: var(--fc-border); opacity: 1; }
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-light { color: var(--fc-text) !important; }
+[data-theme="light"] .text-white-50 { color: var(--fc-muted) !important; }
+[data-theme="light"] .btn-outline-light { color: var(--fc-text); border-color: var(--fc-border-strong); }
+[data-theme="light"] .btn-outline-light:hover { background: var(--fc-text); color: #fff; }
+
+[data-theme] .table {
+    --bs-table-color: var(--fc-text);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--fc-border);
+    --bs-table-striped-color: var(--fc-text);
+    --bs-table-hover-color: var(--fc-text);
+    color: var(--fc-text);
+}
+
+[data-theme] .modal-content {
+    background: var(--fc-dropdown-bg);
+    color: var(--fc-text);
+    border: 1px solid var(--fc-border);
+}
+[data-theme] .modal-header,
+[data-theme] .modal-footer { border-color: var(--fc-border); }
+
+/* ===== Auth pages (login / register / password) ========================= */
+.auth-shell {
+    min-height: 100vh;
+    background: var(--fc-body-bg);
+    color: var(--fc-text);
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+.auth-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: .04em;
+    font-size: 2.5rem;
+    color: var(--fc-accent);
+    text-decoration: none;
+}
+.auth-brand:hover { color: var(--fc-link-hover); }
+.auth-card {
+    width: 100%;
+    max-width: 28rem;
+    margin-top: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    background: var(--fc-panel);
+    border: 1px solid var(--fc-border);
+    border-radius: 1rem;
+    box-shadow: var(--fc-shadow);
+    color: var(--fc-text);
+}
+.auth-card label,
+.auth-card .text-gray-600,
+.auth-card .text-gray-700,
+.auth-card .text-gray-900 { color: var(--fc-text) !important; }
+.auth-card .text-gray-500,
+.auth-card .text-sm.text-gray-600 { color: var(--fc-muted) !important; }
+.auth-card input[type="text"],
+.auth-card input[type="email"],
+.auth-card input[type="password"] {
+    background-color: var(--fc-input-bg) !important;
+    color: var(--fc-text) !important;
+    border: 1px solid var(--fc-border) !important;
+    border-radius: .5rem !important;
+}
+.auth-card input[type="text"]:focus,
+.auth-card input[type="email"]:focus,
+.auth-card input[type="password"]:focus {
+    border-color: var(--fc-accent) !important;
+    box-shadow: 0 0 0 .2rem var(--fc-focus-ring) !important;
+    outline: none !important;
+}
+.auth-card input[type="checkbox"] {
+    background-color: var(--fc-input-bg);
+    border-color: var(--fc-border-strong);
+    color: var(--fc-accent);
+}
+.auth-card a { color: var(--fc-link) !important; }
+.auth-card a:hover { color: var(--fc-link-hover) !important; }
+.auth-card button[type="submit"]:not(.underline) {
+    background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber)) !important;
+    color: var(--fc-on-accent) !important;
+    border: 0 !important;
+    font-weight: 700;
+}
+.auth-card button[type="submit"]:not(.underline):hover { filter: brightness(1.05); }
+.auth-card button.underline { color: var(--fc-link) !important; background: none !important; }
+.auth-card button.underline:hover { color: var(--fc-link-hover) !important; }
+.auth-card .text-red-600 { color: #e5484d !important; }
+.auth-card .text-green-600 { color: #2fa36b !important; }

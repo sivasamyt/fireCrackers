@@ -31,6 +31,7 @@
                 <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">Products</a>
                 <a href="{{ route('admin.gift-boxes.index') }}" class="{{ request()->routeIs('admin.gift-boxes.*') ? 'active' : '' }}">Gift Boxes</a>
                 <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">Orders</a>
+                <a href="{{ route('admin.website.edit') }}" class="{{ request()->routeIs('admin.website.*') ? 'active' : '' }}">Website</a>
                 <a href="{{ route('home') }}">View Store</a>
             </nav>
             <form method="POST" action="{{ route('logout') }}" class="mt-4">@csrf
