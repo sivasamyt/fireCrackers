@@ -52,9 +52,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
-    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
-    Route::patch('orders/{order}/payment-status', [AdminOrderController::class, 'updatePaymentStatus'])->name('orders.payment-status');
-    Route::post('orders/{order}/items', [AdminOrderController::class, 'addItem'])->name('orders.items.store');
+    Route::put('orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
 
     Route::get('website', [AdminWebsiteController::class, 'edit'])->name('website.edit');
     Route::put('website', [AdminWebsiteController::class, 'update'])->name('website.update');
