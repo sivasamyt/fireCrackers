@@ -28,6 +28,24 @@
         }
         .navbar-store .nav-link, .navbar-store .navbar-brand { color: var(--fc-text); }
         .navbar-store .nav-link:hover { color: var(--fc-gold); }
+        .navbar-store .nav-main-link {
+            padding: .4rem .85rem;
+            font-weight: 500;
+            border-radius: .4rem;
+        }
+        .navbar-store .nav-main-link.nav-pill-active {
+            background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
+            color: var(--fc-on-accent);
+            font-weight: 700;
+        }
+        .navbar-store .nav-main-link.nav-pill-active:hover { color: var(--fc-on-accent); filter: brightness(1.05); }
+        @media (min-width: 992px) {
+            .nav-main .nav-divider + .nav-divider { border-left: 1px solid var(--fc-border); padding-left: .25rem; }
+        }
+        @media (max-width: 991.98px) {
+            .navbar-store .nav-main { padding-top: .5rem; }
+            .navbar-store .nav-main-link.nav-pill-active { display: inline-block; margin: .15rem 0; }
+        }
         .btn-gold {
             background: linear-gradient(135deg, var(--fc-gold), var(--fc-amber));
             border: 0;
@@ -40,40 +58,8 @@
             color: var(--fc-gold);
         }
         .btn-outline-gold:hover { background: var(--fc-gold); color: var(--fc-on-accent); }
-        .hero {
-            min-height: 88vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            background:
-                var(--fc-hero-overlay),
-                url('https://images.unsplash.com/photo-1481166852575-bb42b2f0a0ad?auto=format&fit=crop&w=1800&q=80') center/cover no-repeat;
-        }
-        .hero-brand {
-            font-size: clamp(4rem, 12vw, 8rem);
-            line-height: .9;
-            color: var(--fc-hero-title);
-            text-shadow: 0 0 40px var(--fc-hero-title-glow);
-            animation: riseIn .9s ease both;
-        }
-        .hero p { max-width: 34rem; color: var(--fc-hero-text); animation: riseIn 1.1s ease both; }
-        .hero .cta-group { animation: riseIn 1.3s ease both; }
-        @keyframes riseIn {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: none; }
-        }
-        .spark {
-            position: absolute;
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--fc-gold);
-            box-shadow: 0 0 12px var(--fc-gold);
-            animation: twinkle 2.8s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%,100% { opacity: .2; transform: scale(.6); }
-            50% { opacity: 1; transform: scale(1.3); }
-        }
+        .hero-banner img { display: block; width: 100%; height: auto; }
+        section[id] { scroll-margin-top: 80px; }
         .product-card {
             background: var(--fc-surface);
             border: 1px solid var(--fc-border);
@@ -389,8 +375,21 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navMain">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#catalog">Shop</a></li>
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1 nav-main">
+                <li class="nav-item">
+                    <a class="nav-link nav-main-link {{ request()->routeIs('home') ? 'nav-pill-active' : '' }}" href="{{ route('home') }}#catalog">Shop</a>
+                </li>
+                <li class="nav-item nav-divider">
+                    <a class="nav-link nav-main-link {{ request()->routeIs('products.*') ? 'nav-pill-active' : '' }}" href="{{ route('products.index') }}">All Products</a>
+                </li>
+                <li class="nav-item nav-divider">
+                    <a class="nav-link nav-main-link" href="{{ route('home') }}#combos">Combo Packs</a>
+                </li>
+                <li class="nav-item nav-divider">
+                    <a class="nav-link nav-main-link" href="{{ route('home') }}#gift-boxes">Gift Boxes</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-lg-4 align-items-lg-center gap-lg-2 nav-account">
                 @auth
                     @if(auth()->user()->isAdmin())
                         <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a></li>
@@ -403,7 +402,15 @@
                         </form>
                     </li>
                 @else
-                    <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-inline-flex align-items-center gap-1" href="{{ route('login') }}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Login
+                        </a>
+                    </li>
                     <li class="nav-item"><a class="btn btn-sm btn-gold" href="{{ route('register') }}">Register</a></li>
                 @endauth
             </ul>

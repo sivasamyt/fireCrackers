@@ -88,6 +88,23 @@
         @enderror
         <div class="mb-4"></div>
 
+        <h2 class="h5 mb-1 mt-2">Hero banner</h2>
+        <p class="text-muted small mb-3">Shown full-width at the top of the home page. Recommended 1920x750 or wider. The section is hidden when no banner is uploaded.</p>
+        @if($heroImageUrl)
+            <div class="mb-2">
+                <img src="{{ $heroImageUrl }}" alt="Hero banner" class="rounded border mb-2" style="width:100%;max-height:180px;object-fit:cover">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remove_hero_image" value="1" id="remove_hero_image">
+                    <label class="form-check-label" for="remove_hero_image">Remove banner</label>
+                </div>
+            </div>
+        @endif
+        <input type="file" name="hero_image" accept="image/*" class="form-control mb-1 @error('hero_image') is-invalid @enderror">
+        @error('hero_image')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+        <div class="mb-4"></div>
+
         <button class="btn btn-dark">Save</button>
         <a href="{{ route('home') }}" target="_blank" class="btn btn-link">View Store</a>
     </form>

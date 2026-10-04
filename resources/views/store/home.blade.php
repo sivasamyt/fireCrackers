@@ -20,21 +20,16 @@
 @endpush
 
 @section('content')
-<section class="hero">
-    <span class="spark" style="top:18%; left:12%;"></span>
-    <span class="spark" style="top:28%; left:82%; animation-delay:.6s;"></span>
-    <span class="spark" style="top:62%; left:84%; animation-delay:1.2s;"></span>
-    <div class="container py-5">
-        <h1 class="brand-font hero-brand mb-0 fw-normal">Royal Crackers</h1>
-        <p class="fs-5 mt-3">Premium sparklers, rockets, and festive packs delivered to your door. Bright nights. Bold celebrations.</p>
-        <div class="cta-group d-flex gap-3 mt-4 flex-wrap">
-            <a href="#catalog" class="btn btn-gold btn-lg px-4">Shop Now</a>
-            <a href="{{ route('products.index') }}" class="btn btn-outline-gold btn-lg px-4">All Products</a>
-            <a href="#combos" class="btn btn-outline-gold btn-lg px-4">Combo Packs</a>
-            <a href="#gift-boxes" class="btn btn-outline-gold btn-lg px-4">Gift Boxes</a>
-        </div>
-    </div>
+<h1 class="visually-hidden">Royal Crackers</h1>
+
+@php
+    $heroImage = \App\Models\Setting::heroImageUrl();
+@endphp
+@if($heroImage)
+<section class="hero-banner">
+    <img src="{{ $heroImage }}" alt="Royal Crackers" fetchpriority="high">
 </section>
+@endif
 
 <section id="catalog" class="container py-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-3">

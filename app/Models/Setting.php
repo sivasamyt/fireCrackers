@@ -48,6 +48,13 @@ class Setting extends Model
         return $path ? Storage::disk(config('filesystems.media'))->url($path) : null;
     }
 
+    public static function heroImageUrl(): ?string
+    {
+        $path = static::get('hero_image_path');
+
+        return $path ? Storage::disk(config('filesystems.media'))->url($path) : null;
+    }
+
     public static function brandImageUrl(): string
     {
         return static::logoUrl() ?? asset(config('seo.default_image'));
