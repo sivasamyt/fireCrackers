@@ -12,7 +12,7 @@
     <div class="d-flex flex-wrap align-items-end gap-3 justify-content-between">
         <div>
             <h2 class="h6 mb-1">Import from Excel</h2>
-            <p class="text-muted small mb-0">Columns: <code>name</code>, <code>is_active</code> (optional)</p>
+            <p class="text-muted small mb-0">Columns: <code>name</code>, <code>sort_order</code> (optional), <code>is_active</code> (optional)</p>
         </div>
         <a href="{{ route('admin.categories.sample') }}" class="btn btn-outline-dark">Download sample</a>
     </div>
@@ -33,10 +33,11 @@
 
 <div class="card card-stat p-3">
     <table class="table mb-0">
-        <thead><tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Order</th><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Status</th><th></th></tr></thead>
         <tbody>
         @foreach($categories as $category)
             <tr>
+                <td>{{ $category->sort_order ?? '-' }}</td>
                 <td><img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="rounded border" style="width:40px;height:40px;object-fit:cover"></td>
                 <td>{{ $category->name }}</td>
                 <td>{{ $category->slug }}</td>

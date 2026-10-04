@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'sort_order',
         'image_path',
         'is_active',
     ];
@@ -19,6 +21,7 @@ class Category extends Model
     protected function casts(): array
     {
         return [
+            'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -30,6 +33,11 @@ class Category extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
+    }
+
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderByRaw('sort_order IS NULL')->orderBy('sort_order')->orderBy('name');
     }
 
     public function products(): HasMany

@@ -9,14 +9,14 @@ class CategorySampleExport implements FromArray, WithHeadings
 {
     public function headings(): array
     {
-        return ['name', 'is_active'];
+        return ['name', 'sort_order', 'is_active'];
     }
 
     public function array(): array
     {
         return [
-            ['Sparklers', 1],
-            ['Rockets', 1],
+            ['Sparklers', 1, 1],
+            ['Rockets', 2, 1],
         ];
     }
 }

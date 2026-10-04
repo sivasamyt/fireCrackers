@@ -18,7 +18,7 @@ class CategoryController extends Controller
 {
     public function index(): View
     {
-        $categories = Category::query()->withCount('products')->latest()->paginate(15);
+        $categories = Category::query()->withCount('products')->ordered()->paginate(15);
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -64,6 +64,7 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'is_active' => ['nullable', 'boolean'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
@@ -71,6 +72,7 @@ class CategoryController extends Controller
         Category::query()->create([
             'name' => $data['name'],
             'slug' => Str::slug($data['name']).'-'.Str::lower(Str::random(4)),
+            'sort_order' => $data['sort_order'] ?? null,
             'image_path' => $request->hasFile('image')
                 ? $request->file('image')->store('categories', config('filesystems.media'))
                 : null,
@@ -89,6 +91,7 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'is_active' => ['nullable', 'boolean'],
             'image' => ['nullable', 'image', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
@@ -96,6 +99,7 @@ class CategoryController extends Controller
 
         $attributes = [
             'name' => $data['name'],
+            'sort_order' => $data['sort_order'] ?? null,
             'is_active' => $request->boolean('is_active'),
         ];
 

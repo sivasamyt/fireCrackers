@@ -22,6 +22,7 @@ class CategoriesImport implements ToCollection, WithHeadingRow
             $rowNumber = $index + 2;
             $data = [
                 'name' => trim((string) ($row['name'] ?? '')),
+                'sort_order' => ($row['sort_order'] ?? '') === '' ? null : $row['sort_order'],
                 'is_active' => $row['is_active'] ?? 1,
             ];
 
@@ -31,6 +32,7 @@ class CategoriesImport implements ToCollection, WithHeadingRow
 
             $validator = Validator::make($data, [
                 'name' => ['required', 'string', 'max:255'],
+                'sort_order' => ['nullable', 'integer', 'min:0', 'max:100000'],
                 'is_active' => ['nullable'],
             ]);
 
@@ -44,6 +46,7 @@ class CategoriesImport implements ToCollection, WithHeadingRow
                 Category::query()->create([
                     'name' => $data['name'],
                     'slug' => Str::slug($data['name']).'-'.Str::lower(Str::random(4)),
+                    'sort_order' => $data['sort_order'] !== null ? (int) $data['sort_order'] : null,
                     'is_active' => $this->toBoolean($data['is_active'], true),
                 ]);
                 $this->created++;

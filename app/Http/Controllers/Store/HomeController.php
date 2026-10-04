@@ -18,7 +18,7 @@ class HomeController extends Controller
             ->where('is_active', true)
             ->where('slug', '!=', Product::COMBO_CATEGORY_SLUG)
             ->whereHas('products', fn ($q) => $q->where('is_active', true))
-            ->orderBy('name')
+            ->ordered()
             ->get();
 
         $products = Product::query()

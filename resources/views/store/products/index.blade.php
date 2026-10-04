@@ -23,25 +23,33 @@
         </form>
     </div>
 
-    <div class="cat-tiles mb-4" id="category-tiles">
-        <a href="{{ route('products.index') }}" class="cat-tile cat-tile-all {{ $activeCategory === '' ? 'active' : '' }}" data-category-tile="">
-            <span class="cat-tile-count">{{ $totalCount }}</span>
-            <span class="cat-tile-img">
-                @if($siteLogo)
-                    <img src="{{ $siteLogo }}" alt="Show All">
-                @else
-                    <span class="cat-tile-all-icon">★</span>
-                @endif
-            </span>
-            <span class="cat-tile-name">Show All</span>
-        </a>
-        @foreach($categories as $category)
-            <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="cat-tile {{ $activeCategory === $category->slug ? 'active' : '' }}" data-category-tile="{{ $category->slug }}">
-                <span class="cat-tile-count">{{ $category->products_count }}</span>
-                <span class="cat-tile-img"><img src="{{ $category->image_url }}" alt="{{ $category->name }}" loading="lazy"></span>
-                <span class="cat-tile-name">{{ $category->name }}</span>
+    <div class="cat-tiles-wrap mb-4">
+        <button type="button" class="cat-scroll-btn cat-scroll-prev d-none" id="cat-scroll-prev" aria-label="Scroll categories left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="cat-tiles" id="category-tiles">
+            <a href="{{ route('products.index') }}" class="cat-tile cat-tile-all {{ $activeCategory === '' ? 'active' : '' }}" data-category-tile="">
+                <span class="cat-tile-count">{{ $totalCount }}</span>
+                <span class="cat-tile-img">
+                    @if($siteLogo)
+                        <img src="{{ $siteLogo }}" alt="Show All">
+                    @else
+                        <span class="cat-tile-all-icon">★</span>
+                    @endif
+                </span>
+                <span class="cat-tile-name">Show All</span>
             </a>
-        @endforeach
+            @foreach($categories as $category)
+                <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="cat-tile {{ $activeCategory === $category->slug ? 'active' : '' }}" data-category-tile="{{ $category->slug }}">
+                    <span class="cat-tile-count">{{ $category->products_count }}</span>
+                    <span class="cat-tile-img"><img src="{{ $category->image_url }}" alt="{{ $category->name }}" loading="lazy"></span>
+                    <span class="cat-tile-name">{{ $category->name }}</span>
+                </a>
+            @endforeach
+        </div>
+        <button type="button" class="cat-scroll-btn cat-scroll-next d-none" id="cat-scroll-next" aria-label="Scroll categories right">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
     </div>
 
     <div id="all-products-results">
@@ -59,6 +67,35 @@
     const results = document.getElementById('all-products-results');
     const clearBtn = document.getElementById('all-products-clear');
     const tiles = document.getElementById('category-tiles');
+    const prevBtn = document.getElementById('cat-scroll-prev');
+    const nextBtn = document.getElementById('cat-scroll-next');
+
+    if (tiles && prevBtn && nextBtn) {
+        const updateArrows = () => {
+            const maxScroll = tiles.scrollWidth - tiles.clientWidth;
+            const overflowing = maxScroll > 1;
+            prevBtn.classList.toggle('d-none', !overflowing);
+            nextBtn.classList.toggle('d-none', !overflowing);
+            prevBtn.disabled = tiles.scrollLeft <= 1;
+            nextBtn.disabled = tiles.scrollLeft >= maxScroll - 1;
+        };
+        const scrollTiles = (direction) => {
+            tiles.scrollBy({ left: direction * tiles.clientWidth * 0.8, behavior: 'smooth' });
+        };
+
+        prevBtn.addEventListener('click', () => scrollTiles(-1));
+        nextBtn.addEventListener('click', () => scrollTiles(1));
+        tiles.addEventListener('scroll', updateArrows, { passive: true });
+        window.addEventListener('resize', updateArrows);
+        window.addEventListener('load', updateArrows);
+
+        const activeTile = tiles.querySelector('.cat-tile.active:not(.cat-tile-all)');
+        if (activeTile) {
+            tiles.scrollLeft = activeTile.offsetLeft - (tiles.clientWidth - activeTile.offsetWidth) / 2;
+        }
+        updateArrows();
+    }
+
     if (!form || !search || !results) return;
 
     let timer = null;

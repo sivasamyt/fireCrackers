@@ -140,7 +140,7 @@ class ProductController extends Controller
             ['name' => 'Combo', 'is_active' => true]
         );
 
-        $categories = Category::query()->orderBy('name')->get();
+        $categories = Category::query()->ordered()->get();
 
         $componentProducts = Product::query()
             ->with('category')
