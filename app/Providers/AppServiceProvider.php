@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\CartService;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +18,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+
+        if ($this->app->environment('production')) {
+            URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
+        }
 
         View::composer('layouts.store', function ($view) {
             $cart = app(CartService::class);

@@ -1,6 +1,7 @@
 @extends('layouts.store')
 
-@section('title', 'All Products — FireCrackers')
+@section('title', 'All Products | Royal Crackers')
+@section('meta_description', 'Browse all Royal Crackers products by category and add them to your cart.')
 
 @section('content')
 <section class="container py-3 py-md-5 products-page">

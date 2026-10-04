@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'RoyalCrackers')</title>
+    @include('layouts.partials.seo')
     @include('layouts.partials.favicon')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -424,9 +424,9 @@
     <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
         <div class="brand-font fs-4 text-warning d-flex align-items-center gap-2">
             @if($siteLogo)
-                <img src="{{ $siteLogo }}" alt="RoyalCrackers" class="site-logo site-logo-sm">
+                <img src="{{ $siteLogo }}" alt="Royal Crackers" class="site-logo site-logo-sm">
             @endif
-            RoyalCrackers
+            Royal Crackers
         </div>
         <div>Celebrate safely. Follow local firework regulations.</div>
     </div>

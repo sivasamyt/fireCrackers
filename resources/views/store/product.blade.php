@@ -1,6 +1,13 @@
 @extends('layouts.store')
 
-@section('title', $product->name.' — FireCrackers')
+@section('title', $product->name.' | Royal Crackers')
+@section('meta_description', $product->description
+    ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($product->description))), 160)
+    : $product->name.' from Royal Crackers.')
+@section('og_type', 'product')
+@if($product->image_path)
+    @section('og_image', $product->image_url)
+@endif
 
 @push('head')
 <style>

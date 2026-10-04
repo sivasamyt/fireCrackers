@@ -1,6 +1,23 @@
 @extends('layouts.store')
 
-@section('title', 'Royal Crackers — Festival Fireworks Shop')
+@section('title', config('seo.default_title'))
+@section('meta_description', config('seo.default_description'))
+
+@push('structured-data')
+@php
+    $organizationSchema = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => config('seo.site_name'),
+        'url' => url('/').'/',
+        'logo' => \App\Models\Setting::brandImageUrl(),
+        'sameAs' => config('seo.same_as') ?: null,
+    ]);
+@endphp
+<script type="application/ld+json">
+{!! json_encode($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_PRETTY_PRINT) !!}
+</script>
+@endpush
 
 @section('content')
 <section class="hero">
@@ -8,7 +25,7 @@
     <span class="spark" style="top:28%; left:82%; animation-delay:.6s;"></span>
     <span class="spark" style="top:62%; left:84%; animation-delay:1.2s;"></span>
     <div class="container py-5">
-        <div class="brand-font hero-brand">Royal FireCrackers</div>
+        <h1 class="brand-font hero-brand mb-0 fw-normal">Royal Crackers</h1>
         <p class="fs-5 mt-3">Premium sparklers, rockets, and festive packs delivered to your door. Bright nights. Bold celebrations.</p>
         <div class="cta-group d-flex gap-3 mt-4 flex-wrap">
             <a href="#catalog" class="btn btn-gold btn-lg px-4">Shop Now</a>

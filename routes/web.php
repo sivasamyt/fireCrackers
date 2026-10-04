@@ -8,11 +8,14 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\WebsiteController as AdminWebsiteController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\CheckoutController;
 use App\Http\Controllers\Store\HomeController;
 use App\Http\Controllers\Store\ProductController as StoreProductController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [StoreProductController::class, 'index'])->name('products.index');

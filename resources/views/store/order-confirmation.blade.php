@@ -1,6 +1,7 @@
 @extends('layouts.store')
 
-@section('title', 'Order '.$order->order_number)
+@section('title', 'Order '.$order->order_number.' | Royal Crackers')
+@section('robots', 'noindex,nofollow')
 
 @section('content')
 <div class="container py-5">
