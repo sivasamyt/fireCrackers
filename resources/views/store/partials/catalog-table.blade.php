@@ -36,7 +36,7 @@
                 <td class="text-center">₹{{ number_format($product->price, 2) }}</td>
                 <td class="text-center">
                     @if($product->discount_percent > 0)
-                        <span class="catalog-old-price">₹{{ number_format($product->price, 2) }}</span>
+                        <span class="catalog-old-price"> ₹{{ number_format($product->price - $product->discounted_price, 2) }}</span>
                     @else
                         <span class="text-secondary">—</span>
                     @endif
