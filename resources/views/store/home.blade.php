@@ -1,8 +1,20 @@
 @extends('layouts.store')
 
-@section('title', config('seo.default_title'))
+@php
+    $catalogPage = $products->currentPage();
+    $isFilteredCatalog = $search !== '' || $activeCategory !== '';
+@endphp
+
+@section('title', $catalogPage > 1 ? 'Royal Crackers Catalog - Page '.$catalogPage.' | Royal Crackers' : config('seo.default_title'))
 @section('meta_description', config('seo.default_description'))
 
+@if($search !== '')
+    @section('robots', 'noindex,follow')
+@elseif($catalogPage > 1 && ! $isFilteredCatalog)
+    @section('canonical', url('/').'/?page='.$catalogPage)
+@endif
+
+@if($catalogPage === 1 && ! $isFilteredCatalog)
 @push('structured-data')
 @php
     $organizationSchema = array_filter([
@@ -18,6 +30,7 @@
 {!! json_encode($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
+@endif
 
 @section('content')
 <h1 class="visually-hidden">Royal Crackers</h1>

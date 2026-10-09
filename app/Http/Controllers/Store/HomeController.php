@@ -41,6 +41,10 @@ class HomeController extends Controller
             ->paginate(12)
             ->appends($request->only(['q', 'category']));
 
+        if ($products->currentPage() > max($products->lastPage(), 1)) {
+            abort(404);
+        }
+
         $search = $request->string('q')->toString();
         $activeCategory = $request->string('category')->toString();
 

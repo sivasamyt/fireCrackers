@@ -1,9 +1,18 @@
 @extends('layouts.store')
 
-@section('title', $product->name.' | Royal Crackers')
-@section('meta_description', $product->description
-    ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($product->description))), 160)
-    : $product->name.' from Royal Crackers.')
+@php
+    $productCategoryName = $product->category?->name;
+    $productSeoSummary = $product->name
+        .($productCategoryName ? ' ('.\Illuminate\Support\Str::title(\Illuminate\Support\Str::lower($productCategoryName)).')' : '')
+        .' at Royal Crackers - ₹'.number_format((float) $product->discounted_price, 2)
+        .($product->discount_percent > 0 ? ', '.$product->discount_percent.'% off' : '')
+        .'.';
+    $productDescriptionText = $product->description
+        ? trim(preg_replace('/\s+/', ' ', strip_tags($product->description)))
+        : '';
+@endphp
+@section('title', $product->name.($productCategoryName ? ' - '.\Illuminate\Support\Str::title(\Illuminate\Support\Str::lower($productCategoryName)) : '').' | Royal Crackers')
+@section('meta_description', \Illuminate\Support\Str::limit(trim($productSeoSummary.' '.$productDescriptionText), 160))
 @section('og_type', 'product')
 @if($product->image_path)
     @section('og_image', $product->image_url)
@@ -116,7 +125,13 @@
         </div>
         <div class="col-lg-6">
             <div class="panel h-100">
-                <div class="text-secondary">{{ $product->category?->name }}</div>
+                <div class="text-secondary">
+                    @if($product->category && $product->category->is_active && ! $product->isCombo())
+                        <a href="{{ route('products.index', ['category' => $product->category->slug]) }}" class="text-secondary">{{ $product->category->name }}</a>
+                    @else
+                        {{ $product->category?->name }}
+                    @endif
+                </div>
                 <h1 class="brand-font display-4 text-warning">{{ $product->name }}</h1>
                 @php
                     $displayQty = ((int) ($cartQuantity ?? 0)) > 0 ? (int) $cartQuantity : 1;
@@ -139,7 +154,11 @@
                         <ul class="mb-0">
                             @foreach($product->components as $component)
                                 <li>
-                                    <a href="{{ route('products.show', $component->slug) }}">{{ $component->name }}</a>
+                                    @if($component->is_active)
+                                        <a href="{{ route('products.show', $component->slug) }}">{{ $component->name }}</a>
+                                    @else
+                                        {{ $component->name }}
+                                    @endif
                                     @if($component->pivot->quantity > 1)
                                         × {{ $component->pivot->quantity }}
                                     @endif
