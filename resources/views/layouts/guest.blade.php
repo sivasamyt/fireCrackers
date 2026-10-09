@@ -7,7 +7,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="robots" content="noindex,nofollow">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('seo.site_name') }}</title>
         @include('layouts.partials.favicon')
 
         <!-- Fonts -->

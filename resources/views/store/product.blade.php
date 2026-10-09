@@ -9,6 +9,35 @@
     @section('og_image', $product->image_url)
 @endif
 
+@push('structured-data')
+@php
+    $productSchema = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => $product->name,
+        'description' => $product->description
+            ? trim(preg_replace('/\s+/', ' ', strip_tags($product->description)))
+            : null,
+        'image' => $product->image_path ? [$product->image_url] : null,
+        'category' => $product->category?->name,
+        'url' => route('products.show', $product->slug),
+        'offers' => [
+            '@type' => 'Offer',
+            'url' => route('products.show', $product->slug),
+            'priceCurrency' => 'INR',
+            'price' => number_format((float) $product->discounted_price, 2, '.', ''),
+            'availability' => $product->stock > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+            'itemCondition' => 'https://schema.org/NewCondition',
+        ],
+    ]);
+@endphp
+<script type="application/ld+json">
+{!! json_encode($productSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_PRETTY_PRINT) !!}
+</script>
+@endpush
+
 @push('head')
 <style>
     .product-media {
@@ -89,7 +118,9 @@
             <div class="panel h-100">
                 <div class="text-secondary">{{ $product->category?->name }}</div>
                 <h1 class="brand-font display-4 text-warning">{{ $product->name }}</h1>
-                @php($displayQty = ((int) ($cartQuantity ?? 0)) > 0 ? (int) $cartQuantity : 1)
+                @php
+                    $displayQty = ((int) ($cartQuantity ?? 0)) > 0 ? (int) $cartQuantity : 1;
+                @endphp
                 <div class="d-flex align-items-center gap-2 my-3" data-price-row>
                     <span
                         class="price-now fs-3"
