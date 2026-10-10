@@ -201,6 +201,33 @@
     </div>
 </section>
 @endif
+
+@if($reviews->isNotEmpty())
+<section id="reviews" class="container pb-5">
+    <div class="mb-4">
+        <h2 class="brand-font display-5 mb-1 text-warning">Customer Reviews</h2>
+        <p class="text-secondary mb-0">What our customers say about Royal Crackers.</p>
+    </div>
+    <div class="row g-4">
+        @foreach($reviews as $review)
+            <div class="col-sm-6 col-lg-4">
+                <div class="review-card h-100">
+                    <div class="review-stars mb-2" role="img" aria-label="{{ $review->rating }} out of 5 stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="{{ $i <= $review->rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>
+                        @endfor
+                    </div>
+                    <p class="review-text mb-3">{{ $review->description }}</p>
+                    <div class="mt-auto">
+                        <div class="fw-semibold">{{ $review->name }}</div>
+                        <div class="small text-secondary text-break">{{ $review->email }}</div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
+@endif
 @endsection
 
 @push('scripts')

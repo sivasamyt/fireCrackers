@@ -473,6 +473,22 @@
 .catalog-card-total [data-row-total] { color: var(--fc-danger); font-weight: 700; font-size: .85rem; }
 .catalog-card-empty { padding: 1.5rem; text-align: center; color: var(--fc-muted); }
 
+/* ===== Home page reviews ================================================ */
+.review-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border: 1px solid var(--fc-border);
+    border-radius: 1rem;
+    background: var(--fc-surface);
+    color: var(--fc-text);
+    box-shadow: var(--fc-shadow);
+}
+.review-stars { font-size: 1.2rem; letter-spacing: .1em; color: var(--fc-muted); }
+.review-stars span { opacity: .45; }
+.review-stars .is-filled { color: var(--fc-accent); opacity: 1; }
+.review-text { white-space: pre-line; color: var(--fc-text); }
+
 @media (max-width: 767.98px) {
     .products-search-form { width: 100%; }
     .products-search { min-width: 0; }

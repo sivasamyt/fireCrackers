@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\GiftBox;
 use App\Models\Product;
+use App\Models\Review;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -70,11 +71,18 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+        $reviews = Review::query()
+            ->where('is_active', true)
+            ->ordered()
+            ->take(12)
+            ->get();
+
         return view('store.home', [
             'products' => $products,
             'categories' => $categories,
             'combos' => $combos,
             'giftBoxes' => $giftBoxes,
+            'reviews' => $reviews,
             'cartCount' => $cart->count(),
             'cartQuantities' => $cart->productQuantities(),
             'giftBoxQuantities' => $cart->giftBoxQuantities(),
