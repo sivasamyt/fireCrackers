@@ -212,15 +212,37 @@
         @foreach($reviews as $review)
             <div class="col-sm-6 col-lg-4">
                 <div class="review-card h-100">
-                    <div class="review-stars mb-2" role="img" aria-label="{{ $review->rating }} out of 5 stars">
-                        @for($i = 1; $i <= 5; $i++)
-                            <span class="{{ $i <= $review->rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>
-                        @endfor
+                    <div class="review-head d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div class="review-author">
+                            <div class="fw-semibold">{{ $review->name }}</div>
+                            <div class="small text-secondary text-break">{{ $review->email }}</div>
+                        </div>
+                        <div class="review-stars flex-shrink-0" role="img" aria-label="{{ $review->rating }} out of 5 stars">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="{{ $i <= $review->rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>
+                            @endfor
+                        </div>
                     </div>
-                    <p class="review-text mb-3">{{ $review->description }}</p>
-                    <div class="mt-auto">
-                        <div class="fw-semibold">{{ $review->name }}</div>
-                        <div class="small text-secondary text-break">{{ $review->email }}</div>
+                    <p class="review-text review-text-clamp mb-0" data-review-text data-full-text="{{ $review->description }}"><span data-review-body>{{ $review->description }}</span><button type="button" class="btn btn-link p-0 review-more d-none" data-bs-toggle="modal" data-bs-target="#review-{{ $review->id }}">View more</button></p>
+                </div>
+            </div>
+
+            <div class="modal fade" id="review-{{ $review->id }}" tabindex="-1" aria-labelledby="review-label-{{ $review->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="review-label-{{ $review->id }}">{{ $review->name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="review-stars mb-2" role="img" aria-label="{{ $review->rating }} out of 5 stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <span class="{{ $i <= $review->rating ? 'is-filled' : '' }}" aria-hidden="true">★</span>
+                                @endfor
+                            </div>
+                            <p class="review-text review-text-full">{{ $review->description }}</p>
+                            <div class="small text-secondary text-break mb-0">{{ $review->email }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,6 +254,52 @@
 
 @push('scripts')
 <script>
+(() => {
+    const texts = document.querySelectorAll('[data-review-text]');
+    if (!texts.length) return;
+
+    const maxLines = 3;
+
+    const fitReview = (el) => {
+        const body = el.querySelector('[data-review-body]');
+        const button = el.querySelector('.review-more');
+        const full = (el.dataset.fullText || '').replace(/\s+/g, ' ').trim();
+        if (!body || !button) return;
+
+        el.classList.remove('review-text-clamp');
+        body.textContent = full;
+        button.classList.add('d-none');
+
+        const maxHeight = parseFloat(getComputedStyle(el).lineHeight) * maxLines + 1;
+        if (el.offsetHeight <= maxHeight) return;
+
+        button.classList.remove('d-none');
+        let low = 0;
+        let high = full.length;
+        while (low < high) {
+            const mid = Math.ceil((low + high) / 2);
+            body.textContent = full.slice(0, mid).trimEnd() + '… ';
+            if (el.offsetHeight <= maxHeight) {
+                low = mid;
+            } else {
+                high = mid - 1;
+            }
+        }
+        body.textContent = full.slice(0, low).trimEnd() + '… ';
+    };
+
+    const fitAll = () => texts.forEach(fitReview);
+
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(fitAll, 150);
+    });
+    window.addEventListener('load', fitAll);
+    document.fonts?.ready.then(fitAll);
+    fitAll();
+})();
+
 (() => {
     const form = document.getElementById('catalog-filter');
     const search = document.getElementById('catalog-search');
