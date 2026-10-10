@@ -56,6 +56,12 @@
     --fc-focus-ring: rgba(245,196,81,.2);
     --fc-shadow: 0 16px 40px rgba(0,0,0,.45);
 
+    /* Slider buttons */
+    --fc-nav-btn-bg: rgba(245,196,81,.18);
+    --fc-nav-btn-color: #f5c451;
+    --fc-nav-btn-hover-bg: #a86f00;
+    --fc-nav-btn-hover-color: #ffffff;
+
     /* Hero */
     --fc-hero-overlay: linear-gradient(90deg, rgba(5,7,15,.92) 0%, rgba(5,7,15,.55) 45%, rgba(5,7,15,.25) 100%);
     --fc-hero-title: #f5c451;
@@ -117,6 +123,12 @@
     --fc-border-soft: rgba(176,120,0,.14);
     --fc-border-strong: rgba(176,120,0,.55);
     --fc-focus-ring: rgba(201,138,0,.2);
+
+    /* Slider buttons */
+    --fc-nav-btn-bg: #fdf0cf;
+    --fc-nav-btn-color: #a86f00;
+    --fc-nav-btn-hover-bg: #8a5a00;
+    --fc-nav-btn-hover-color: #ffffff;
     --fc-shadow: 0 16px 40px rgba(31,36,51,.12);
 
     /* Hero */
@@ -474,6 +486,48 @@
 .catalog-card-empty { padding: 1.5rem; text-align: center; color: var(--fc-muted); }
 
 /* ===== Home page reviews ================================================ */
+.review-track {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: .25rem 0 .75rem;
+}
+.review-track::-webkit-scrollbar { display: none; }
+.review-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; }
+@media (min-width: 768px) { .review-slide { flex-basis: calc((100% - 1.5rem) / 2); } }
+@media (min-width: 992px) { .review-slide { flex-basis: calc((100% - 3rem) / 3); } }
+.review-nav-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--fc-border);
+    background: var(--fc-nav-btn-bg);
+    color: var(--fc-nav-btn-color);
+    transition: background .15s ease, color .15s ease, border-color .15s ease, opacity .15s ease;
+}
+.review-nav-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.review-nav-btn:hover:not(:disabled) {
+    background: var(--fc-nav-btn-hover-bg);
+    border-color: var(--fc-nav-btn-hover-bg);
+    color: var(--fc-nav-btn-hover-color);
+}
+.review-nav-btn:focus-visible { outline: none; box-shadow: 0 0 0 .25rem var(--fc-focus-ring); }
+.review-nav-btn:disabled { opacity: .4; cursor: default; }
 .review-card {
     display: flex;
     flex-direction: column;

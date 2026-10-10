@@ -208,9 +208,9 @@
         <h2 class="brand-font display-5 mb-1 text-warning">Customer Reviews</h2>
         <p class="text-secondary mb-0">What our customers say about Royal Crackers.</p>
     </div>
-    <div class="row g-4">
+    <div class="review-track" data-review-track>
         @foreach($reviews as $review)
-            <div class="col-sm-6 col-lg-4">
+            <div class="review-slide">
                 <div class="review-card h-100">
                     <div class="review-head d-flex justify-content-between align-items-start gap-2 mb-3">
                         <div class="review-author">
@@ -226,7 +226,18 @@
                     <p class="review-text review-text-clamp mb-0" data-review-text data-full-text="{{ $review->description }}"><span data-review-body>{{ $review->description }}</span><button type="button" class="btn btn-link p-0 review-more d-none" data-bs-toggle="modal" data-bs-target="#review-{{ $review->id }}">View more</button></p>
                 </div>
             </div>
+        @endforeach
+    </div>
+    <div class="review-nav d-flex justify-content-center gap-3 mt-3" data-review-nav>
+        <button type="button" class="review-nav-btn" data-review-prev aria-label="Previous reviews">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" class="review-nav-btn" data-review-next aria-label="Next reviews">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+    </div>
 
+    @foreach($reviews as $review)
             <div class="modal fade" id="review-{{ $review->id }}" tabindex="-1" aria-labelledby="review-label-{{ $review->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
                     <div class="modal-content">
@@ -246,8 +257,7 @@
                     </div>
                 </div>
             </div>
-        @endforeach
-    </div>
+    @endforeach
 </section>
 @endif
 @endsection
@@ -298,6 +308,34 @@
     window.addEventListener('load', fitAll);
     document.fonts?.ready.then(fitAll);
     fitAll();
+})();
+
+(() => {
+    const track = document.querySelector('[data-review-track]');
+    const nav = document.querySelector('[data-review-nav]');
+    const prev = document.querySelector('[data-review-prev]');
+    const next = document.querySelector('[data-review-next]');
+    if (!track || !nav || !prev || !next) return;
+
+    const updateNav = () => {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        nav.classList.toggle('d-none', maxScroll <= 1);
+        prev.disabled = track.scrollLeft <= 1;
+        next.disabled = track.scrollLeft >= maxScroll - 1;
+    };
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -track.clientWidth, behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: track.clientWidth, behavior: 'smooth' }));
+
+    let scrollTimer = null;
+    const scheduleUpdate = () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(updateNav, 80);
+    };
+    track.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('load', updateNav);
+    updateNav();
 })();
 
 (() => {
