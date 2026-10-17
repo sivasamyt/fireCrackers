@@ -279,8 +279,6 @@
     const closeBtn = document.getElementById('upi-qr-lightbox-close');
     const inner = document.getElementById('upi-qr-lightbox-inner');
 
-    let allowPaidSubmit = false;
-
     const isUpi = () => document.getElementById('upi')?.checked;
     const isPaidClaim = () => document.getElementById('upi-paid')?.checked;
 
@@ -314,12 +312,12 @@
 
     const closeTxnModal = () => {
         if (!txnModal) return;
+        txnError?.classList.add('d-none');
         txnModal.classList.add('d-none');
         txnModal.setAttribute('aria-hidden', 'true');
         if (lightbox?.classList.contains('d-none') !== false) {
             document.body.style.overflow = '';
         }
-        allowPaidSubmit = false;
     };
 
     const syncPaymentUi = () => {
@@ -342,13 +340,12 @@
             return;
         }
 
-        if (allowPaidSubmit && txnHidden?.value.trim()) {
+        if (txnHidden?.value.trim()) {
             return;
         }
 
         e.preventDefault();
         openTxnModal();
-        alert('Please enter your UPI transaction ID to continue.');
     });
 
     txnConfirm?.addEventListener('click', () => {
@@ -359,7 +356,6 @@
             return;
         }
         if (txnHidden) txnHidden.value = value;
-        allowPaidSubmit = true;
         closeTxnModal();
         form?.requestSubmit();
     });
