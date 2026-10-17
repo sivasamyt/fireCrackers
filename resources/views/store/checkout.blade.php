@@ -120,7 +120,23 @@
                 <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Phone</label>
-                        <input type="text" name="guest_phone" value="{{ old('guest_phone') }}" class="form-control" required>
+                        <input
+                            type="tel"
+                            name="guest_phone"
+                            value="{{ old('guest_phone') }}"
+                            class="form-control @error('guest_phone') is-invalid @enderror"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                            maxlength="13"
+                            pattern="^(\+91|91|0)?[6-9][0-9]{9}$"
+                            title="Enter a valid 10-digit Indian mobile number"
+                            placeholder="10-digit mobile number"
+                            required
+                        >
+                        <div class="form-text">10-digit mobile number</div>
+                        @error('guest_phone')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-12">
                         <label class="form-label">Address line 1</label>

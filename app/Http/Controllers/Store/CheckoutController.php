@@ -52,7 +52,7 @@ class CheckoutController extends Controller
         $data = $request->validate([
             'guest_name' => [Rule::requiredIf(! auth()->check()), 'nullable', 'string', 'max:255'],
             'guest_email' => ['nullable', 'email', 'max:255'],
-            'guest_phone' => ['required', 'string', 'max:20'],
+            'guest_phone' => ['required', 'string', 'max:20', 'regex:/^(\+91|91|0)?[6-9]\d{9}$/'],
             'address_line1' => ['required', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:100'],
@@ -73,6 +73,8 @@ class CheckoutController extends Controller
                 'string',
                 'max:100',
             ],
+        ], [
+            'guest_phone.regex' => 'Enter a valid 10-digit Indian mobile number.',
         ]);
 
         $transactionId = null;
